@@ -1,0 +1,15 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.cancelButton {
+  &:global(.ant-btn) {
+    color: $danger-color;
+    border-color: $danger-color;
+
+    &:hover {
+      color: darken($danger-color, 10%);
+      border-color: darken($danger-color, 10%);
+      background: rgba($danger-color, 0.04);
+    }
+  }
+}

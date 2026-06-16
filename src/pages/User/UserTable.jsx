@@ -1,5 +1,5 @@
 import { Table, Tag, Button, Popconfirm, Space, Tooltip, Avatar } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, CarryOutOutlined } from '@ant-design/icons';
 import {
   DEPARTMENTS,
   USER_STATUS,
@@ -7,7 +7,7 @@ import {
 } from '../../constants/userConstants';
 import styles from './UserTable.module.scss';
 
-function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, onViewDetails }) {
+function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, onViewDetails, onViewTasks }) {
   const columns = [
     {
       title: 'Ảnh đại diện',
@@ -121,6 +121,11 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
           <Tooltip title= "Xem chi tiết chi tiêu">
             <Button type='text' icon={<EyeOutlined />} style={{ color: 'blue' }}
             onClick={() => onViewDetails(record)}
+            />
+          </Tooltip>
+          <Tooltip title= "Xem danh sách công việc">
+            <Button type='text' icon={<CarryOutOutlined />} style={{ color: 'blue' }}
+            onClick={() => onViewTasks(record)}
             />
           </Tooltip>
         </Space>

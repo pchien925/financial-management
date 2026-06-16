@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Input, Select, Radio, DatePicker, Button, Card, Row, Col, Modal, Upload, message } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import {LoadingOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
+import {LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import axios from 'axios';
 import dayjs from 'dayjs';

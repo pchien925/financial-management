@@ -17,6 +17,8 @@ const PAGE_TITLES = {
   '/users/add': 'Thêm Người Dùng',
   '/users/edit': 'Chỉnh Sửa Người Dùng',
   '/users/:id/details': 'Chi Tiêu Người Dùng',
+  '/tasks': 'Quản Lý Công Việc',
+  '/users/:id/tasks': 'Danh Sách Công Việc',
 }
 
 function AppHeader({ collapsed, toggleCollapsed }) {
@@ -29,6 +31,8 @@ function AppHeader({ collapsed, toggleCollapsed }) {
       title = 'Chỉnh Sửa Giao Dịch';
     } else if (location.pathname.startsWith('/users/edit/')) {
       title = 'Chỉnh Sửa Người Dùng';
+    } else if (location.pathname.startsWith('/users/') && location.pathname.endsWith('/tasks')) {
+      title = 'Danh Sách Công Việc';
     } else {
       title = 'Trang Chủ';
     }
