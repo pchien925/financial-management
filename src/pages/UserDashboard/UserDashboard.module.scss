@@ -1,0 +1,50 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.dashboardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.pageTitle {
+  font-size: $font-size-title;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+}
+
+.statCard {
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+
+  &.total :global(.ant-statistic-content) {
+    color: $primary-color;
+  }
+
+  &.active :global(.ant-statistic-content) {
+    color: $success-color;
+  }
+
+  &.inactive :global(.ant-statistic-content) {
+    color: $text-secondary;
+  }
+}
+
+.tableSection {
+  @include card-style;
+
+  :global {
+    .ant-table-thead > tr > th {
+      background: $bg-primary;
+      font-weight: 600;
+    }
+  }
+}
+
+.tableSectionTitle {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-md 0;
+}

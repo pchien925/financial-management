@@ -1,0 +1,85 @@
+{
+  "transactions": [
+    {
+      "note": "Mua sách React ",
+      "amount": 300000,
+      "type": "expense",
+      "category": "education",
+      "date": "2026-05-30",
+      "id": "4"
+    },
+    {
+      "id": "5",
+      "note": "Freelance thiết kế logo",
+      "amount": 3000000,
+      "type": "income",
+      "category": "salary",
+      "date": "2026-05-28"
+    },
+    {
+      "id": "6",
+      "note": "Tiền điện tháng 5",
+      "amount": 450000,
+      "type": "expense",
+      "category": "bills",
+      "date": "2026-05-25"
+    },
+    {
+      "id": "8",
+      "note": "Mua áo mới",
+      "amount": 350000,
+      "type": "expense",
+      "category": "shopping",
+      "date": "2026-05-20"
+    },
+    {
+      "note": "Ăn trưa với đồng nghiệp",
+      "amount": 1000000,
+      "type": "income",
+      "category": "food",
+      "date": "2026-06-19",
+      "id": "YRhKRrWVwhw"
+    },
+    {
+      "note": "Ăn tối với đồng nghiệp",
+      "amount": 1000000,
+      "type": "expense",
+      "category": "food",
+      "date": "2026-06-19",
+      "id": "wU7JzewgaZ0"
+    },
+    {
+      "note": "Đi chơi Đà Lạt",
+      "amount": 3000000,
+      "type": "expense",
+      "category": "entertainment",
+      "date": "2026-06-13",
+      "id": "nrc-a8v_8pk"
+    },
+    {
+      "note": "Cài win dạo",
+      "amount": 500000,
+      "type": "income",
+      "category": "bills",
+      "date": "2026-06-08",
+      "id": "HkMetrt5cDQ"
+    },
+    {
+      "note": "Đi siêu thị",
+      "amount": 1000000,
+      "type": "expense",
+      "category": "shopping",
+      "date": "2026-06-08",
+      "id": "fBTWgvcbZ98"
+    },
+    {
+      "note": "Ăn sáng",
+      "amount": 40000,
+      "type": "expense",
+      "category": "food",
+      "date": "2026-06-09",
+      "id": "rCWwqNL_beI"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}

@@ -1,0 +1,15 @@
+@import '../../styles/variables';
+
+.filterWrapper {
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $border-radius;
+}
+
+.searchInput {
+  width: 250px;
+}
+
+.occupationSelect {
+  min-width: 180px;
+}

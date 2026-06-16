@@ -1,0 +1,30 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.header {
+  @include flex-between;
+
+  background: $bg-white !important;
+  padding: 0 $spacing-lg !important;
+  box-shadow: $box-shadow;
+
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toggleButton {
+  font-size: 18px;
+  width: 48px;
+  height: 48px;
+}
+
+.title {
+  font-size: $font-size-title;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  padding-right: 48px;
+}

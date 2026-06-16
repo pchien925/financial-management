@@ -1,0 +1,14 @@
+@import '../../styles/variables';
+
+.tableWrapper {
+  :global {
+    .ant-table-thead > tr > th {
+      background: $bg-primary;
+      font-weight: 600;
+    }
+  }
+}
+
+.editButton {
+  color: $primary-color;
+}

@@ -1,0 +1,45 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.detailModal {
+  :global {
+    .ant-modal-header {
+      border-bottom: 1px solid $bg-primary;
+      padding-bottom: $spacing-md;
+    }
+
+    .ant-modal-title {
+      font-size: $font-size-lg;
+      font-weight: 600;
+    }
+
+    .ant-modal-body {
+      padding-top: $spacing-md;
+    }
+
+    // Style cho các field disabled để dễ đọc hơn
+    .ant-input-disabled,
+    .ant-input-number-disabled,
+    .ant-picker-disabled,
+    .ant-select-disabled .ant-select-selector {
+      color: $text-primary !important;
+      background-color: $bg-primary !important;
+      cursor: default !important;
+    }
+
+    .ant-radio-button-wrapper-disabled {
+      color: $text-secondary !important;
+      cursor: default !important;
+
+      &.ant-radio-button-wrapper-checked {
+        color: $bg-white !important;
+        background: $primary-color !important;
+        border-color: $primary-color !important;
+      }
+    }
+  }
+}
+
+.detailForm {
+  padding-top: $spacing-xs;
+}

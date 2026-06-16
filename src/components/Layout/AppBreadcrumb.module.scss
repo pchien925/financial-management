@@ -1,0 +1,19 @@
+.breadcrumb {
+  margin-top: 17px;
+  padding-left: 20px;
+
+  a.linkText {
+    color: #015ee0; // Ant Design blue link color
+    transition: color 0.3s;
+    font-weight: 500;
+
+    &:hover {
+      color: #69b1ff;
+    }
+  }
+
+  .activeText {
+    color: rgba(0, 0, 0, 0.88);
+    font-weight: 600;
+  }
+}

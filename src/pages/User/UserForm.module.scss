@@ -1,0 +1,48 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.formPageWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.formCard {
+  @include card-style;
+
+  :global {
+    .ant-card-head {
+      border-bottom: 1px solid $bg-primary;
+    }
+    .ant-card-head-title {
+      font-size: $font-size-lg;
+      font-weight: 600;
+    }
+  }
+}
+
+.form {
+  padding-top: $spacing-sm;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $bg-primary;
+  margin-top: $spacing-md;
+}
+
+.cancelButton {
+  &:global(.ant-btn) {
+    color: $danger-color;
+    border-color: $danger-color;
+
+    &:hover {
+      color: darken($danger-color, 10%);
+      border-color: darken($danger-color, 10%);
+      background: rgba($danger-color, 0.04);
+    }
+  }
+}

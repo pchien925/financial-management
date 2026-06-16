@@ -1,0 +1,14 @@
+@import '../../styles/variables';
+
+.appLayout {
+  min-height: 100vh;
+}
+
+.content {
+  margin: $spacing-lg;
+  padding: $spacing-lg;
+  background: $bg-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+  min-height: 360px;
+}

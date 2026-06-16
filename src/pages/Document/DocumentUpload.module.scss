@@ -1,0 +1,97 @@
+@import '../../styles/variables';
+
+.documentUpload {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.documentRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.fileNameInput {
+  flex: 1;
+
+  &:global(.ant-input) {
+    cursor: default;
+  }
+
+  &:global(.ant-input[readonly]) {
+    background-color: $bg-white;
+  }
+}
+
+.uploadInputWrapper {
+  flex: 1;
+  position: relative;
+}
+
+.hiddenInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.deleteBtn {
+  &:global(.ant-btn) {
+    color: $danger-color;
+    font-size: $font-size-lg;
+
+    &:hover {
+      color: darken($danger-color, 10%);
+      background: rgba($danger-color, 0.06);
+    }
+  }
+}
+
+.downloadBtn {
+  &:global(.ant-btn) {
+    color: $primary-color;
+    font-size: $font-size-lg;
+
+    &:hover {
+      color: darken($primary-color, 10%);
+      background: rgba($primary-color, 0.06);
+    }
+  }
+}
+
+.uploadBtn {
+  &:global(.ant-btn) {
+    color: $text-secondary;
+    font-size: $font-size-lg;
+
+    &:hover {
+      color: $primary-color;
+      background: rgba($primary-color, 0.06);
+    }
+  }
+}
+
+.addButton {
+  &:global(.ant-btn) {
+    margin-top: $spacing-xs;
+    border-style: dashed;
+    color: $text-secondary;
+
+    &:hover {
+      color: $primary-color;
+      border-color: $primary-color;
+    }
+  }
+}

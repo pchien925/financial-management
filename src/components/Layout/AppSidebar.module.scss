@@ -1,0 +1,23 @@
+@import '../../styles/variables';
+
+.sidebar {
+  overflow: auto;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.logo {
+  height: $header-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-white;
+  font-size: $font-size-lg;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 $spacing-md;
+}

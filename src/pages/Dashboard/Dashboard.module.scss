@@ -1,0 +1,66 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.dashboardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.pageTitle {
+  font-size: $font-size-title;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0;
+}
+
+.filterCard {
+  padding: $spacing-md;
+  background: $bg-primary;
+  border-radius: $border-radius;
+}
+
+.statCard {
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow;
+
+  &.income :global(.ant-statistic-content) {
+    color: $success-color;
+  }
+
+  &.expense :global(.ant-statistic-content) {
+    color: $danger-color;
+  }
+
+  &.balance :global(.ant-statistic-content) {
+    color: $primary-color;
+  }
+}
+
+.tableSection {
+  @include card-style;
+
+  :global {
+    .ant-table-thead > tr > th {
+      background: $bg-primary;
+      font-weight: 600;
+    }
+  }
+}
+
+.tableSectionTitle {
+  font-size: $font-size-lg;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 $spacing-md 0;
+}
+
+.incomeAmount {
+  font-weight: 600;
+  font-size: $font-size-base;
+}
+
+.expenseAmount {
+  font-weight: 600;
+  font-size: $font-size-base;
+}
