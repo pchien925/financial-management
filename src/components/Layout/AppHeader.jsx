@@ -19,6 +19,7 @@ const PAGE_TITLES = {
   '/users/:id/details': 'Chi Tiêu Người Dùng',
   '/tasks': 'Quản Lý Công Việc',
   '/users/:id/tasks': 'Danh Sách Công Việc',
+  '/taskboard': 'Bảng Công Việc',
 }
 
 function AppHeader({ collapsed, toggleCollapsed }) {

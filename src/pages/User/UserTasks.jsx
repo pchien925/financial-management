@@ -9,7 +9,7 @@ import TasksUpdateModal from '../Tasks/TasksUpdateModal';
 import styles from './User.module.scss';
 import dayjs from 'dayjs';
 import { DAYS_OF_WEEK } from '../../constants/tasksConstants';
-import { addTask, updateTask, deleteTask } from '../../redux/features/tasks/tasksSlice';
+import { addTask, updateTask, deleteTask, reorderTasks } from '../../redux/features/tasks/tasksSlice';
 import {useSearchParams} from 'react-router-dom';
 
 function UserTasks() {
@@ -55,6 +55,10 @@ function UserTasks() {
     dispatch(deleteTask(taskId));
   };
 
+  const handleReorder = (activeId, overId) => {
+    dispatch(reorderTasks({ activeId, overId }));
+  };
+
   const tabItems = DAYS_OF_WEEK.map((day) => ({
     key: day.value,
     label: day.label,
@@ -90,6 +94,7 @@ function UserTasks() {
         dataSource={filteredTasks}
         onEdit={handleEditTask}
         onDelete={handleDeleteTask}
+        onReorder={handleReorder}
         hideUserColumn
       />
 

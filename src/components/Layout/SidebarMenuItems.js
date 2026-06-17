@@ -40,6 +40,10 @@ const SidebarMenuItems = [
             {
                 key: '/tasks',
                 label: 'Công việc'
+            },
+            {
+                key:'/taskboard',
+                label: 'Bảng công việc'
             }
         ]
     }

@@ -102,6 +102,8 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
       title: 'Hành động',
       key: 'action',
       width: 150,
+      align: 'center',
+      fixed: 'right',
       render: (_, record) => (
         <Space>
           <Tooltip title="Sửa">
@@ -138,6 +140,7 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
         columns={columns}
         dataSource={dataSource}
         rowKey="id"
+        scroll={{ x: 'max-content' }}
         onRow={(record) => ({
           onClick: () => onRowClick?.(record),
           style: { cursor: 'pointer' },

@@ -1,150 +1,53 @@
-import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
+import React, { useMemo } from 'react';
 import { Table, Button, Popconfirm, Space, Tooltip, message } from 'antd';
-import { EditOutlined, DeleteOutlined, MenuOutlined } from '@ant-design/icons'; // Thêm MenuOutlined
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { EditOutlined, DeleteOutlined, MenuOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+
+import DragableRow from './DragableRow';
 import styles from './TasksTable.module.scss';
-import { useDispatch, useSelector } from 'react-redux';
-
-const DragHandleContext = createContext(null);
-
-// Component này sẽ hiển thị icon 3 gạch và nhận quyền "được phép kéo"
-const DragHandle = () => {
-  const drag = useContext(DragHandleContext);
-  return (
-    <MenuOutlined
-      ref={drag} // Gắn ref drag vào chính xác cái icon này
-      style={{ cursor: 'grab', color: '#999', fontSize: 16 }}
-      title="Giữ để di chuyển"
-    />
-  );
-};
-
-const type = 'DraggableBodyRow';
-
-const DraggableBodyRow = ({ index, moveRow, onDrop, className, style, ...restProps }) => {
-  const ref = useRef(null);
-
-  // Cấu hình Drop (Điểm thả - áp dụng cho toàn bộ hàng)
-  const [{ isOver, dropClassName }, drop] = useDrop({
-    accept: type,
-    collect: (monitor) => {
-      const { index: dragIndex } = monitor.getItem() || {};
-      if (dragIndex === index) return {};
-      return {
-        isOver: monitor.isOver(),
-        dropClassName: dragIndex < index ? ' drop-over-downward' : ' drop-over-upward',
-      };
-    },
-    hover: (item, monitor) => {
-      if (!ref.current) return;
-      const dragIndex = item.index;
-      const hoverIndex = index;
-
-      if (dragIndex === hoverIndex) return;
-
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-      const clientOffset = monitor.getClientOffset();
-      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
-
-      moveRow(dragIndex, hoverIndex);
-      item.index = hoverIndex;
-    },
-  });
-
-  // Cấu hình Drag (Điểm kéo) -> Trả về thêm preview
-  const [{ isDragging }, drag, preview] = useDrag({
-    type,
-    item: { index, originalIndex: index },
-    end: (item, monitor) => {
-      if (item.index !== item.originalIndex) {
-        if (onDrop) onDrop();
-      }
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  // Áp dụng điểm thả (drop) và ảnh mờ khi kéo (preview) cho toàn bộ thẻ <tr>
-  drop(preview(ref));
-
-  return (
-    // Dùng Provider để ném hàm 'drag' xuống cho các ô con bên trong (cụ thể là DragHandle)
-    <DragHandleContext.Provider value={drag}>
-      <tr
-        ref={ref}
-        className={`${className}${isOver ? dropClassName : ''}`}
-        // Xóa cursor: 'grab' ở đây vì giờ chỉ icon mới có hình bàn tay
-        style={{ ...style }} 
-        {...restProps}
-      />
-    </DragHandleContext.Provider>
-  );
-};
 
 function TasksTable({ dataSource, onEdit, onDelete, onReorder, hideUserColumn }) {
-  const [data, setData] = useState(dataSource);
-  const dataRef = useRef(data);
-  const dispatch = useDispatch();
   const { users } = useSelector((state) => state.user);
 
-  // Cập nhật dữ liệu khi dataSource thay đổi
-  useEffect(() => {
-    setData(dataSource);
-  }, [dataSource]);
-
-  useEffect(() => {
-    dataRef.current = data;
-  }, [data]);
-
-  // Hàm này sẽ được gọi khi một hàng được thả xuống vị trí mới
-  const moveRow = useCallback(
-    (dragIndex, hoverIndex) => {
-      const dragRow = data[dragIndex];
-      const newData = [...data];
-      
-      newData.splice(dragIndex, 1);
-      newData.splice(hoverIndex, 0, dragRow);
-      
-      setData(newData);
-    },
-    [data],
+  // Cấu hình kích hoạt kéo thả: Di chuyển chuột 5px mới drag để tránh lỗi khi click nút hành động
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
   );
 
-  const handleDrop = useCallback(() => {
-    message.success('Đã thay đổi vị trí công việc!');
-    if (onReorder) {
-      onReorder(dataRef.current);
+  // Xử lý sự kiện sau khi thả hàng công việc
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active && over && active.id !== over.id) {
+      if (onReorder) {
+        onReorder(active.id, over.id); // Trả id về component cha để xử lý reorder trong list tổng
+      }
+      message.success('Đã thay đổi vị trí công việc!');
     }
-  }, [onReorder]);
+  };
 
   const allColumns = [
     {
+      title: '',
       key: 'sort',
-      align: 'center',
       width: 40,
-      render: () => <DragHandle />,
+      align: 'center',
+      render: () => (
+        // Nút icon hiển thị cho người dùng biết chỗ này dùng để nắm kéo
+        <MenuOutlined style={{ cursor: 'move', color: '#999' }} />
+      ),
     },
     {
       title: 'STT',
       key: 'index',
       width: 60,
       render: (_, __, index) => index + 1,
-    },
-    {
-        title: 'Người dùng',
-        dataIndex: 'userId',
-        key: 'userName',
-        width: 140,
-        render: (userId) => {
-          const found = users.find((u) => u.id === userId);
-          return found ? found.name : 'Không xác định';
-        },
     },
     {
       title: 'Tên công việc',
@@ -158,6 +61,16 @@ function TasksTable({ dataSource, onEdit, onDelete, onReorder, hideUserColumn })
       key: 'expectedTime',
       width: 200,
       render: (text) => (text ? `${Number((text / 60).toFixed(2))}h` : ''),
+    },
+    {
+      title: 'Người dùng',
+      dataIndex: 'userId',
+      key: 'userName',
+      width: 140,
+      render: (userId) => {
+        const found = users.find((u) => u.id === userId);
+        return found ? found.name : 'Không xác định';
+      },
     },
     {
       title: 'Ngày tạo',
@@ -177,8 +90,11 @@ function TasksTable({ dataSource, onEdit, onDelete, onReorder, hideUserColumn })
       title: 'Hành động',
       key: 'action',
       width: 120,
+      align: 'center',
+      fixed: 'right',
       render: (_, record) => (
-        <Space>
+        // Chặn onMouseDown để hành động click sửa/xóa không kích hoạt cơ chế Drag hành hạ UI
+        <Space onMouseDown={(e) => e.stopPropagation()}>
           <Tooltip title="Sửa">
             <Button
               type="text"
@@ -204,33 +120,38 @@ function TasksTable({ dataSource, onEdit, onDelete, onReorder, hideUserColumn })
     },
   ];
 
-  const columns = hideUserColumn
-    ? allColumns.filter((col) => col.key !== 'userName')
-    : allColumns;
-
-  const components = {
-    body: {
-      row: DraggableBodyRow,
-    },
-  };
+  const columns = useMemo(() => {
+    return hideUserColumn
+      ? allColumns.filter((col) => col.key !== 'userName')
+      : allColumns;
+  }, [hideUserColumn, users]);
 
   return (
     <div className={styles.tableWrapper}>
-      <DndProvider backend={HTML5Backend}>
-        <Table
-          columns={columns}
-          dataSource={data}
-          components={components}
-          rowKey="id"
-          pagination={false}
-          size="middle"
-          onRow={(_, index) => ({
-            index,
-            moveRow,
-            onDrop: handleDrop,
-          })}
-        />
-      </DndProvider>
+      <DndContext 
+        sensors={sensors} 
+        collisionDetection={closestCenter} 
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext 
+          items={dataSource.map((i) => i.id)} 
+          strategy={verticalListSortingStrategy}
+        >
+          <Table
+            columns={columns}
+            dataSource={dataSource}
+            rowKey="id"
+            scroll={{x: 'max-content'}}
+            pagination={false}
+            size="middle"
+            components={{
+              body: {
+                row: DragableRow, // Ép Antd Table sử dụng Custom Row kéo thả của chúng ta
+              },
+            }}
+          />
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }

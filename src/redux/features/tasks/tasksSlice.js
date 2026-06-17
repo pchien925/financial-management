@@ -35,6 +35,21 @@ const tasksSlice = createSlice({
     deleteTask: (state, action) => {
       state.tasks = state.tasks.filter((t) => t.id !== action.payload);
     },
+
+    setTasks: (state, action) => {
+      state.tasks = action.payload;
+    },
+
+    // Thay đổi vị trí công việc
+    reorderTasks: (state, action) => {
+      const { activeId, overId } = action.payload;
+      const oldIndex = state.tasks.findIndex((t) => t.id === activeId);
+      const newIndex = state.tasks.findIndex((t) => t.id === overId);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const [movedTask] = state.tasks.splice(oldIndex, 1);
+        state.tasks.splice(newIndex, 0, movedTask);
+      }
+    },
   },
 });
 
@@ -43,6 +58,8 @@ export const {
   addTask,
   updateTask,
   deleteTask,
+  setTasks,
+  reorderTasks,
 } = tasksSlice.actions;
 
 // Xuất Reducer để gắn vào Store

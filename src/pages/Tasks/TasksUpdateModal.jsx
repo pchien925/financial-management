@@ -16,7 +16,6 @@ function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUs
   }));
 
   // Nếu không có task, không hiển thị modal
-  const lockedUser = lockedUserId ? users.find((u) => u.id === lockedUserId) : null;
 
   useEffect(() => {
     if (task && open) {
@@ -44,17 +43,24 @@ function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUs
   };
 
   const handleCancel = () => {
-    Modal.confirm({
-      title: 'Xác nhận hủy',
-      content: 'Bạn có chắc muốn hủy cập nhật công việc?',
-      okText: 'Đồng ý',
-      cancelText: 'Không',
-      onOk: () => {
-        form.resetFields();
-        setIsChanged(false);
-        onCancel();
-      },
-    });
+    if (isChanged) {
+      Modal.confirm({
+        title: 'Xác nhận hủy',
+        content: 'Bạn có chắc muốn hủy cập nhật công việc?',
+        okText: 'Đồng ý',
+        cancelText: 'Không',
+        onOk: () => {
+          form.resetFields();
+          setIsChanged(false);
+          onCancel();
+        },
+      });
+    } else {
+      // Nếu không có thay đổi gì, tắt Modal luôn
+      form.resetFields();
+      setIsChanged(false);
+      onCancel();
+    }
   };
 
   const handleValuesChange = () => {
@@ -108,24 +114,19 @@ function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUs
         >
           <InputNumber min={1} style={{ width: '100%' }} placeholder="Nhập số phút" />
         </Form.Item>
-        {lockedUserId ? (
-          <Form.Item label="Người dùng">
-            <Input value={lockedUser?.name} disabled />
-          </Form.Item>
-        ) : (
-          <Form.Item
-            label="Người dùng"
-            name="userId"
-            rules={[{ required: true, message: 'Vui lòng chọn người dùng!' }]}
-          >
-            <Select
-              showSearch
-              placeholder="Chọn người dùng"
-              options={userOptions}
-              filterOption={(input, option) => option.label.toLowerCase().includes(input.toLowerCase())}
-            />
-          </Form.Item>
-        )}
+        <Form.Item
+          label="Người dùng"
+          name="userId"
+          rules={[{ required: true, message: 'Vui lòng chọn người dùng!' }]}
+        >
+          <Select
+            showSearch={!lockedUserId}
+            placeholder="Chọn người dùng"
+            options={userOptions}
+            filterOption={(input, option) => option.label.toLowerCase().includes(input.toLowerCase())}
+            disabled={!!lockedUserId}
+          />
+        </Form.Item>
       </Form>
     </Modal>
   );

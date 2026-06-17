@@ -10,6 +10,7 @@ import UserTransactions from "../pages/User/UserTransacitons";
 import UserTransactionForm from "../pages/User/UserTransactionForm";
 import Tasks from "../pages/Tasks/Tasks";
 import UserTasks from "../pages/User/UserTasks";
+import TaskBoard from "../pages/TaskBoard/TaskBoard";
 
 const routers = createBrowserRouter([
   {
@@ -71,6 +72,10 @@ const routers = createBrowserRouter([
       {
         path: 'tasks',
         element: <Tasks/>
+      },
+      {
+        path: '/taskboard',
+        element: <TaskBoard/>
       }
     ]
   }

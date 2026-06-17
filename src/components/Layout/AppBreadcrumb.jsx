@@ -16,6 +16,7 @@ const breadcrumbNameMap = {
   '/users/:id/details/add': 'Thêm Chi Tiêu',
   '/users/:id/tasks': 'Danh sách công việc',
   '/tasks': 'Công việc',
+  '/taskboard': 'Bảng công việc',
 };
 
 const AppBreadcrumb = () => {

@@ -8,8 +8,8 @@ import TasksUpdateModal from './TasksUpdateModal';
 import styles from './Tasks.module.scss';
 import dayjs from 'dayjs';
 import { DAYS_OF_WEEK } from '../../constants/tasksConstants';
-import { addTask, updateTask, deleteTask } from '../../redux/features/tasks/tasksSlice';
-import {useSearchParams} from 'react-router-dom';
+import { addTask, updateTask, deleteTask, reorderTasks } from '../../redux/features/tasks/tasksSlice';
+import { useSearchParams } from 'react-router-dom';
 
 function Tasks() {
   const dispatch = useDispatch();
@@ -22,9 +22,25 @@ function Tasks() {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((t) => t.dayOfWeek === activeDay);
-  }, [tasks, activeDay]);
+  // Tạo tab items dựa trên DAYS_OF_WEEK và tasks
+  // Sử dụng useMemo để tránh tính toán lại không cần thiết khi tasks thay đổi
+  const tabItems = useMemo(() => {
+    return DAYS_OF_WEEK.map((day) => ({
+      key: day.value,
+      label: day.label,
+      children: (
+        <TasksTable
+          dataSource={tasks.filter((t) => t.dayOfWeek === day.value)}
+          onEdit={(task) => {
+            setEditingTask(task);
+            setIsUpdateModalOpen(true);
+          }}
+          onDelete={(taskId) => dispatch(deleteTask(taskId))}
+          onReorder={(activeId, overId) => dispatch(reorderTasks({ activeId, overId }))}
+      />
+    ),
+  }));
+}, [tasks, dispatch])
 
   // Cập nhật URL khi thay đổi tab
   const handleTabChange = (key) => {
@@ -36,72 +52,52 @@ function Tasks() {
     setIsAddFormOpen(false);
   };
 
-  const handleEditTask = (task) => {
-    setEditingTask(task);
-    setIsUpdateModalOpen(true);
-  };
-
   const handleUpdateTask = (updatedTask) => {
     dispatch(updateTask(updatedTask));
     setIsUpdateModalOpen(false);
     setEditingTask(null);
   };
 
-  const handleDeleteTask = (taskId) => {
-    dispatch(deleteTask(taskId));
-  };
-
-  const tabItems = DAYS_OF_WEEK.map((day) => ({
-    key: day.value,
-    label: day.label,
-  }));
-
-  return (
-    <div className={styles.tasksWrapper}>
-      <div className={styles.toolbar}>
-        <h2 className={styles.pageTitle}>Quản lý công việc</h2>
-      </div>
-
-      <Tabs
-        activeKey={activeDay}
-        onChange={handleTabChange}
-        items={tabItems}
-        className={styles.dayTabs}
-        tabBarExtraContent={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setIsAddFormOpen(true)}
-          >
-            Thêm công việc
-          </Button>
-        }
-      />
-
-      <TasksTable
-        dataSource={filteredTasks}
-        onEdit={handleEditTask}
-        onDelete={handleDeleteTask}
-      />
-
-      <TasksForm
-        open={isAddFormOpen}
-        onCancel={() => setIsAddFormOpen(false)}
-        onSubmit={handleAddTask}
-      />
-
-      <TasksUpdateModal
-        open={isUpdateModalOpen}
-        task={editingTask}
-        onCancel={() => {
-          setIsUpdateModalOpen(false);
-          setEditingTask(null);
-        }}
-        onSubmit={handleUpdateTask}
-        daysOfWeek={DAYS_OF_WEEK}
-      />
+return (
+  <div className={styles.tasksWrapper}>
+    <div className={styles.toolbar}>
+      <h2 className={styles.pageTitle}>Quản lý công việc</h2>
     </div>
-  );
+
+    <Tabs
+      activeKey={activeDay}
+      onChange={handleTabChange}
+      items={tabItems}
+      className={styles.dayTabs}
+      tabBarExtraContent={
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setIsAddFormOpen(true)}
+        >
+          Thêm công việc
+        </Button>
+      }
+    />
+
+    <TasksForm
+      open={isAddFormOpen}
+      onCancel={() => setIsAddFormOpen(false)}
+      onSubmit={handleAddTask}
+    />
+
+    <TasksUpdateModal
+      open={isUpdateModalOpen}
+      task={editingTask}
+      onCancel={() => {
+        setIsUpdateModalOpen(false);
+        setEditingTask(null);
+      }}
+      onSubmit={handleUpdateTask}
+      daysOfWeek={DAYS_OF_WEEK}
+    />
+  </div>
+);
 }
 
 export default Tasks;

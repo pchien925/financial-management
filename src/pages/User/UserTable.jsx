@@ -91,7 +91,9 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
     {
       title: 'Hành động',
       key: 'action',
-      width: 150,
+      width: 200,
+      align: 'center',
+      fixed: 'right',
       render: (_, record) => (
         <Space>
           <Tooltip title="Sửa">
@@ -139,6 +141,7 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
         columns={columns}
         dataSource={dataSource}
         rowKey="id"
+        scroll={{ x: 'max-content' }}
         pagination={{
           current: currentPage,
           pageSize: 6,
