@@ -48,7 +48,7 @@ function Tasks() {
   };
 
   const handleAddTask = (newTask) => {
-    dispatch(addTask({ ...newTask, createdAt: dayjs().format('YYYY-MM-DD'), dayOfWeek: activeDay }));
+    dispatch(addTask({ ...newTask, createdAt: dayjs().format('YYYY-MM-DD'), dayOfWeek: activeDay, status: 'todo' }));
     setIsAddFormOpen(false);
   };
 
