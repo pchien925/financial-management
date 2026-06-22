@@ -1,13 +1,15 @@
 import { Layout, Menu } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
-import SidebarMenuItems from './SidebarMenuItems';
+import { getSidebarMenuItems } from './SidebarMenuItems';
 import styles from './AppSidebar.module.scss';
+import { useIntl } from 'react-intl';
 
 const { Sider } = Layout;
 
 function AppSidebar({ collapsed }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const intl = useIntl();
 
   const handleMenuClick = ({ key }) => {
     navigate(key);
@@ -23,6 +25,8 @@ function AppSidebar({ collapsed }) {
   } else if (location.pathname.startsWith('/dashboard')) {
     activeKey = '/dashboard/finance';
   }
+
+  const SidebarMenuItems = getSidebarMenuItems(intl);
 
   return (
     <Sider

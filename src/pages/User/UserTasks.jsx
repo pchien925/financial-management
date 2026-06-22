@@ -11,10 +11,27 @@ import dayjs from 'dayjs';
 import { DAYS_OF_WEEK } from '../../constants/tasksConstants';
 import { addTask, updateTask, deleteTask, reorderTasks } from '../../redux/features/tasks/tasksSlice';
 import {useSearchParams} from 'react-router-dom';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+
+
+const messages = defineMessages({
+  khongTimThayNguoiDung: {
+    defaultMessage: 'Không tìm thấy người dùng!'
+  },
+  congViecCuaName: {
+    defaultMessage: 'Công việc của: {name}'
+  },
+  themCongViec: {
+    defaultMessage: 'Thêm công việc'
+  }
+});
+
 
 function UserTasks() {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const intl = useIntl();
+  const translatedDaysOfWeek = DAYS_OF_WEEK.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value}`, defaultMessage: item.label?.defaultMessage || item.label || item.value }) }));
   const { tasks } = useSelector((state) => state.tasks);
   const { users } = useSelector((state) => state.user);
 
@@ -59,19 +76,19 @@ function UserTasks() {
     dispatch(reorderTasks({ activeId, overId }));
   };
 
-  const tabItems = DAYS_OF_WEEK.map((day) => ({
+  const tabItems = translatedDaysOfWeek.map((day) => ({
     key: day.value,
     label: day.label,
   }));
 
   if (!user) {
-    return <p>Không tìm thấy người dùng!</p>;
+    return <p><FormattedMessage {...messages.khongTimThayNguoiDung}  /></p>;
   }
 
   return (
     <div className={styles.userWrapper}>
       <div className={styles.toolbar}>
-        <h2 className={styles.pageTitle}>Công việc của: {user.name}</h2>
+        <h2 className={styles.pageTitle}><FormattedMessage {...messages.congViecCuaName}  values={{ name: user.name }} /></h2>
       </div>
 
       <Tabs
@@ -85,7 +102,7 @@ function UserTasks() {
             icon={<PlusOutlined />}
             onClick={() => setIsAddFormOpen(true)}
           >
-            Thêm công việc
+            <FormattedMessage {...messages.themCongViec}  />
           </Button>
         }
       />
@@ -113,7 +130,7 @@ function UserTasks() {
           setEditingTask(null);
         }}
         onSubmit={handleUpdateTask}
-        daysOfWeek={DAYS_OF_WEEK}
+        daysOfWeek={translatedDaysOfWeek}
         lockedUserId={Number(id)}
       />
     </div>

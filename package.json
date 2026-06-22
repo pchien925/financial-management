@@ -30,10 +30,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "extract": "cross-env NODE_ENV=development extract-messages -l en,vi -o src/locales -d vi \"src/**/*.{js,jsx}\""
   },
   "eslintConfig": {
     "extends": [
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "babel-plugin-react-intl-auto": "^3.3.0",
+    "cross-env": "^10.1.0",
     "extract-react-intl-messages": "^5.0.0"
   }
 }

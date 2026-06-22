@@ -11,24 +11,108 @@ import {
 import { addTransaction, updateTransaction } from '../../redux/features/finance/financeSlice';
 import DocumentUpload from '../Document/DocumentUpload';
 import styles from './UserForm.module.scss'; // Dùng lại style của UserForm
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
-const typeRadioOptions = [
-  {
-    value: TRANSACTION_TYPES.INCOME,
-    label: TRANSACTION_TYPE_LABELS[TRANSACTION_TYPES.INCOME],
+
+const messages = defineMessages({
+  ghiChu: {
+    defaultMessage: 'Ghi chú'
   },
-  {
-    value: TRANSACTION_TYPES.EXPENSE,
-    label: TRANSACTION_TYPE_LABELS[TRANSACTION_TYPES.EXPENSE],
+  soTien: {
+    defaultMessage: 'Số tiền'
   },
-];
+  loaiGiaoDich: {
+    defaultMessage: 'Loại giao dịch'
+  },
+  danhMuc: {
+    defaultMessage: 'Danh mục'
+  },
+  ngay: {
+    defaultMessage: 'Ngày'
+  },
+  nguoiDung: {
+    defaultMessage: 'Người dùng'
+  },
+  taiLieuDinhKem: {
+    defaultMessage: 'Tài liệu đính kèm'
+  },
+  huy: {
+    defaultMessage: 'Hủy'
+  },
+  capNhat: {
+    defaultMessage: 'Cập nhật'
+  },
+  themMoi: {
+    defaultMessage: 'Thêm mới'
+  },
+  banCoMuonDongTrangNay: {
+    defaultMessage: 'Bạn có muốn đóng trang này?'
+  },
+  co: {
+    defaultMessage: 'Có'
+  },
+  chinhSuaGiaoDich: {
+    defaultMessage: 'Chỉnh sửa giao dịch'
+  },
+  themGiaoDichMoi: {
+    defaultMessage: 'Thêm giao dịch mới'
+  },
+  vuiLongNhapGhiChu: {
+    defaultMessage: 'Vui lòng nhập ghi chú!'
+  },
+  vdAnTruaVoiDongNghiep: {
+    defaultMessage: 'VD: Ăn trưa với đồng nghiệp'
+  },
+  vuiLongNhapSoTien: {
+    defaultMessage: 'Vui lòng nhập số tiền!'
+  },
+  vd1000000: {
+    defaultMessage: 'VD: 1000000'
+  },
+  vuiLongChonLoai: {
+    defaultMessage: 'Vui lòng chọn loại!'
+  },
+  vuiLongChonDanhMuc: {
+    defaultMessage: 'Vui lòng chọn danh mục!'
+  },
+  chonDanhMuc: {
+    defaultMessage: 'Chọn danh mục'
+  },
+  vuiLongChonNgay: {
+    defaultMessage: 'Vui lòng chọn ngày!'
+  },
+  chonNgay: {
+    defaultMessage: 'Chọn ngày'
+  },
+  vuiLongChonNguoiDung: {
+    defaultMessage: 'Vui lòng chọn người dùng!'
+  },
+  chonNguoiDung: {
+    defaultMessage: 'Chọn người dùng'
+  }
+});
+
 
 function UserTransactionForm() {
-  const { userId, transactionId } = useParams();
+  const { id: userId, transactionId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [searchParams] = useSearchParams();
+  const intl = useIntl();
+  const translatedCategories = CATEGORIES.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
+  const translatedTypeLabels = Object.keys(TRANSACTION_TYPE_LABELS).reduce((acc, key) => { acc[key] = intl.formatMessage({ id: `app.constant.${key}`, defaultMessage: TRANSACTION_TYPE_LABELS[key] }); return acc; }, {});
+
+  const typeRadioOptions = [
+    {
+      value: TRANSACTION_TYPES.INCOME,
+      label: translatedTypeLabels[TRANSACTION_TYPES.INCOME],
+    },
+    {
+      value: TRANSACTION_TYPES.EXPENSE,
+      label: translatedTypeLabels[TRANSACTION_TYPES.EXPENSE],
+    },
+  ];
 
   const { transactions } = useSelector((state) => state.finance);
   const { users } = useSelector((state) => state.user);
@@ -95,9 +179,9 @@ function UserTransactionForm() {
 
   const handleCancel = () => {
     Modal.confirm({
-      title: 'Bạn có muốn đóng trang này?',
-      okText: 'Có',
-      cancelText: 'Hủy',
+      title: intl.formatMessage(messages.banCoMuonDongTrangNay),
+      okText: intl.formatMessage(messages.co),
+      cancelText: intl.formatMessage(messages.huy),
       onOk: () => {
         navigate(backUrl);
       }
@@ -126,7 +210,7 @@ function UserTransactionForm() {
   return (
     <div className={styles.formPageWrapper}>
       <Card
-        title={isUpdate ? 'Chỉnh sửa giao dịch' : 'Thêm giao dịch mới'}
+        title={isUpdate ? intl.formatMessage(messages.chinhSuaGiaoDich) : intl.formatMessage(messages.themGiaoDichMoi)}
         className={styles.formCard}
       >
         <Form
@@ -139,24 +223,24 @@ function UserTransactionForm() {
           <Row gutter={24}>
             <Col span={12}>
               <Form.Item
-                label="Ghi chú"
+                label={<FormattedMessage {...messages.ghiChu}  />}
                 name="note"
-                rules={[{ required: true, message: 'Vui lòng nhập ghi chú!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongNhapGhiChu) }]}
               >
-                <Input placeholder="VD: Ăn trưa với đồng nghiệp" />
+                <Input placeholder={intl.formatMessage(messages.vdAnTruaVoiDongNghiep)} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label="Số tiền (VNĐ)"
+                label={<FormattedMessage {...messages.soTien}  />}
                 name="amount"
-                rules={[{ required: true, message: 'Vui lòng nhập số tiền!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongNhapSoTien) }]}
               >
                 <InputNumber
                   style={{ width: '100%' }}
                   min={0}
-                  placeholder="VD: 1000000"
+                  placeholder={intl.formatMessage(messages.vd1000000)}
                   formatter={(value) =>
                     `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                   }
@@ -167,9 +251,9 @@ function UserTransactionForm() {
 
             <Col span={12}>
               <Form.Item
-                label="Loại giao dịch"
+                label={<FormattedMessage {...messages.loaiGiaoDich}  />}
                 name="type"
-                rules={[{ required: true, message: 'Vui lòng chọn loại!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonLoai) }]}
               >
                 <Radio.Group
                   options={typeRadioOptions}
@@ -181,34 +265,34 @@ function UserTransactionForm() {
 
             <Col span={12}>
               <Form.Item
-                label="Danh mục"
+                label={<FormattedMessage {...messages.danhMuc}  />}
                 name="category"
-                rules={[{ required: true, message: 'Vui lòng chọn danh mục!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonDanhMuc) }]}
               >
-                <Select placeholder="Chọn danh mục" options={CATEGORIES} />
+                <Select placeholder={intl.formatMessage(messages.chonDanhMuc)} options={translatedCategories} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label="Ngày"
+                label={<FormattedMessage {...messages.ngay}  />}
                 name="date"
-                rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonNgay) }]}
                 getValueFromEvent={(date) => date ? date.format('YYYY-MM-DD') : ''}
                 getValueProps={(value) => ({ value: value ? dayjs(value) : null })}
               >
-                <DatePicker format="DD-MM-YYYY" style={{ width: '100%' }} placeholder="Chọn ngày" />
+                <DatePicker format="DD-MM-YYYY" style={{ width: '100%' }} placeholder={intl.formatMessage(messages.chonNgay)} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label="Người dùng"
+                label={<FormattedMessage {...messages.nguoiDung}  />}
                 name="userId"
-                rules={[{ required: true, message: 'Vui lòng chọn người dùng!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonNguoiDung) }]}
               >
                 <Select
-                  placeholder="Chọn người dùng"
+                  placeholder={intl.formatMessage(messages.chonNguoiDung)}
                   options={userOptions}
                   disabled={true}
                 />
@@ -217,7 +301,7 @@ function UserTransactionForm() {
 
             <Col span={24}>
               <Form.Item
-                label="Tài liệu đính kèm"
+                label={<FormattedMessage {...messages.taiLieuDinhKem}  />}
                 name="documents"
               >
                 <DocumentUpload />
@@ -227,10 +311,10 @@ function UserTransactionForm() {
 
           <div className={styles.buttonGroup}>
             <Button className={styles.cancelButton} onClick={handleCancel}>
-              Hủy
+              <FormattedMessage {...messages.huy}  />
             </Button>
             <Button type="primary" htmlType="submit" disabled={!isChanged}>
-              {isUpdate ? 'Cập nhật' : 'Thêm mới'}
+              {isUpdate ? <FormattedMessage {...messages.capNhat}  /> : <FormattedMessage {...messages.themMoi}  />}
             </Button>
           </div>
         </Form>

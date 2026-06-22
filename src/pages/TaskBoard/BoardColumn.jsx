@@ -4,8 +4,17 @@ import { useDroppable } from '@dnd-kit/core';
 import { PlusOutlined } from '@ant-design/icons';
 import BoardCard from './BoardCard';
 import styles from './TaskBoard.module.scss';
+import { useIntl, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  themTaskVaoTitle: {
+    defaultMessage: 'Thêm task vào {title}'
+  }
+});
+
 
 function BoardColumn({ columnId, title, tasks, onAddClick, onDeleteTask }) {
+  const intl = useIntl();
   // useDroppable giúp dnd-kit hiểu đây là một "vùng chứa" có thể thả thẻ vào
   // Rất quan trọng khi kéo thẻ vào một cột ĐANG TRỐNG không có thẻ nào
   const { setNodeRef } = useDroppable({
@@ -22,7 +31,7 @@ function BoardColumn({ columnId, title, tasks, onAddClick, onDeleteTask }) {
           <span
             onClick={() => onAddClick(columnId)}
             className={styles.addButton}
-            title={`Thêm task vào ${title}`}
+            title={intl.formatMessage(messages.themTaskVaoTitle, { title })}
           >
             <PlusOutlined />
           </span>

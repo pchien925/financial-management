@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { defineMessages } from "react-intl";
 import AppLayout from "../components/Layout/AppLayout";
 import Finance from "../pages/Finance/finance";
 import Dashboard from "../pages/Dashboard/Dashboard";
@@ -11,6 +12,23 @@ import UserTransactionForm from "../pages/User/UserTransactionForm";
 import Tasks from "../pages/Tasks/Tasks";
 import UserTasks from "../pages/User/UserTasks";
 import TaskBoard from "../pages/TaskBoard/TaskBoard";
+
+const messages = defineMessages({
+  financeStats: { defaultMessage: 'Thống kê Tài Chính' },
+  userStats: { defaultMessage: 'Thống kê Người Dùng' },
+  manageTransactions: { defaultMessage: 'Quản Lý Giao Dịch' },
+  addTransaction: { defaultMessage: 'Thêm Giao Dịch' },
+  editTransaction: { defaultMessage: 'Chỉnh Sửa Giao Dịch' },
+  manageUsers: { defaultMessage: 'Quản lý người dùng' },
+  addUser: { defaultMessage: 'Thêm người dùng' },
+  editUser: { defaultMessage: 'Chỉnh sửa người dùng' },
+  userSpendings: { defaultMessage: 'Chi Tiêu Người Dùng' },
+  addSpending: { defaultMessage: 'Thêm chi tiêu' },
+  editSpending: { defaultMessage: 'Chỉnh Sửa Chi Tiêu' },
+  userTasks: { defaultMessage: 'Danh sách công việc' },
+  manageTasks: { defaultMessage: 'Quản lý công việc' },
+  taskBoard: { defaultMessage: 'Bảng công việc' },
+});
 
 const routers = createBrowserRouter([
   {
@@ -28,19 +46,19 @@ const routers = createBrowserRouter([
           {
             path: 'finance',
             element: <Dashboard />,
-            handle: { title: 'Thống kê Tài Chính' }
+            handle: { title: messages.financeStats }
           },
           {
             path: 'user',
             element: <UserDashboard />,
-            handle: { title: 'Thống kê Người Dùng' }
+            handle: { title: messages.userStats }
           }
         ]
       },
 
       {
         path: 'transactions',
-        handle: { title: 'Quản Lý Giao Dịch' },
+        handle: { title: messages.manageTransactions },
         children: [
           {
             index: true,
@@ -49,19 +67,19 @@ const routers = createBrowserRouter([
           {
             path: 'add',
             element: <FinanceForm />,
-            handle: { title: 'Thêm Giao Dịch' }
+            handle: { title: messages.addTransaction }
           },
           {
             path: 'edit/:id',
             element: <FinanceForm />,
-            handle: { title: 'Chỉnh Sửa Giao Dịch' }
+            handle: { title: messages.editTransaction }
           }
         ]
       },
 
       {
         path: 'users',
-        handle: { title: 'Quản lý người dùng' },
+        handle: { title: messages.manageUsers },
         children: [
           {
             index: true,
@@ -70,17 +88,17 @@ const routers = createBrowserRouter([
           {
             path: 'add',
             element: <UserForm />,
-            handle: { title: 'Thêm người dùng' }
+            handle: { title: messages.addUser }
           },
           {
             path: 'edit/:id',
             element: <UserForm />,
-            handle: { title: 'Chỉnh sửa người dùng' }
+            handle: { title: messages.editUser }
           },
 
           {
             path: ':id/details',
-            handle: { title: 'Chi Tiêu Người Dùng' },
+            handle: { title: messages.userSpendings },
             children: [
               {
                 index: true,
@@ -89,12 +107,12 @@ const routers = createBrowserRouter([
               {
                 path: 'add',
                 element: <UserTransactionForm />,
-                handle: { title: 'Thêm chi tiêu' }
+                handle: { title: messages.addSpending }
               },
               {
                 path: 'edit/:transactionId',
                 element: <UserTransactionForm />,
-                handle: { title: 'Chỉnh Sửa Chi Tiêu' }
+                handle: { title: messages.editSpending }
               }
             ]
           },
@@ -102,7 +120,7 @@ const routers = createBrowserRouter([
           {
             path: ':id/tasks',
             element: <UserTasks />,
-            handle: { title: 'Danh sách công việc' }
+            handle: { title: messages.userTasks }
           }
         ]
       },
@@ -110,12 +128,12 @@ const routers = createBrowserRouter([
       {
         path: 'tasks',
         element: <Tasks />,
-        handle: { title: 'Quản lý công việc' }
+        handle: { title: messages.manageTasks }
       },
       {
         path: 'taskboard',
         element: <TaskBoard />,
-        handle: { title: 'Bảng công việc' }
+        handle: { title: messages.taskBoard }
       }
     ]
   }

@@ -7,10 +7,31 @@ import UserFilter from './UserFilter';
 import UserTable from './UserTable';
 import styles from './User.module.scss';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  quanLyNguoiDung: {
+    defaultMessage: 'Quản lý người dùng'
+  },
+  themNguoiDung: {
+    defaultMessage: 'Thêm người dùng'
+  },
+  khongTheXoaNguoiDung: {
+    defaultMessage: 'Không thể xóa người dùng'
+  },
+  xoaNguoiDungThanhCong: {
+    defaultMessage: 'Xóa người dùng thành công!'
+  },
+  nguoiDungNayConCountGiaoDichVuiLongXoaHetGiaoDichTruocKhiXoaNguoiDung: {
+    defaultMessage: 'Người dùng này còn {count} giao dịch. Vui lòng xóa hết giao dịch trước khi xóa người dùng.'
+  }
+});
+
 
 function User() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const intl = useIntl();
   const { users } = useSelector((state) => state.user);
   const { transactions } = useSelector((state) => state.finance);
 
@@ -79,14 +100,14 @@ function User() {
 
     if (userTransactions.length > 0) {
       notification.warning({
-        message: 'Không thể xóa người dùng',
-        description: `Người dùng này còn ${userTransactions.length} giao dịch. Vui lòng xóa hết giao dịch trước khi xóa người dùng.`,
+        message: intl.formatMessage(messages.khongTheXoaNguoiDung),
+        description: intl.formatMessage(messages.nguoiDungNayConCountGiaoDichVuiLongXoaHetGiaoDichTruocKhiXoaNguoiDung, { count: userTransactions.length }),
       });
       return;
     }
 
     dispatch(deleteUser(id));
-    message.success('Xóa người dùng thành công!');
+    message.success(intl.formatMessage(messages.xoaNguoiDungThanhCong));
   };
 
   const handleViewDetails = (record) => {
@@ -100,7 +121,7 @@ function User() {
   return (
     <div className={styles.userWrapper}>
       <div className={styles.toolbar}>
-        <h2 className={styles.pageTitle}>Quản lý người dùng</h2>
+        <h2 className={styles.pageTitle}><FormattedMessage {...messages.quanLyNguoiDung}  /></h2>
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -109,7 +130,7 @@ function User() {
             navigate(`/users/add?${searchParams.toString()}`);
           }}
         >
-          Thêm người dùng
+          <FormattedMessage {...messages.themNguoiDung}  />
         </Button>
       </div>
       <UserFilter

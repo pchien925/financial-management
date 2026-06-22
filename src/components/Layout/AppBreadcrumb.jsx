@@ -2,10 +2,19 @@ import React from 'react';
 import { Breadcrumb } from 'antd';
 import { useMatches, Link, useLocation } from 'react-router-dom';
 import styles from './AppBreadcrumb.module.scss';
+import { useIntl, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  trangChu: {
+    defaultMessage: 'Trang chủ'
+  }
+});
+
 
 const AppBreadcrumb = () => {
   const matches = useMatches();
   const location = useLocation();
+  const intl = useIntl();
 
   const breadcrumbMatches = matches.filter(match => match.handle?.title);
 
@@ -14,11 +23,12 @@ const AppBreadcrumb = () => {
   const items = [
     {
       key: 'home',
-      title: <Link className={styles.linkText} to="/dashboard/finance">Trang chủ</Link>,
+      title: <Link className={styles.linkText} to="/dashboard/finance">{intl.formatMessage(messages.trangChu)}</Link>,
     },
     ...breadcrumbMatches.map((match, index) => {
       const isLast = index === breadcrumbMatches.length - 1;
-      const titleText = match.handle.title;
+      const formatMsg = intl.formatMessage;
+      const titleText = formatMsg(match.handle.title);
 
       return {
         key: match.id || match.pathname, 
