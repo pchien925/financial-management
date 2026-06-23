@@ -93,6 +93,10 @@ function User() {
     navigate(`/users/${record.id}/details?${searchParams.toString()}`);
   };
 
+  const handleViewTasks = (record) => {
+    navigate(`/users/${record.id}/tasks?${searchParams.toString()}`);
+  };
+
   return (
     <div className={styles.userWrapper}>
       <div className={styles.toolbar}>
@@ -128,6 +132,7 @@ function User() {
         currentPage={currentPage}
         onPageChange={handlePageChange}
         onViewDetails={handleViewDetails}
+        onViewTasks={handleViewTasks}
       />
     </div>
   );

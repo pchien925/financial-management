@@ -8,6 +8,9 @@ import FinanceForm from "../pages/Finance/FinanceForm";
 import UserForm from "../pages/User/UserForm";
 import UserTransactions from "../pages/User/UserTransacitons";
 import UserTransactionForm from "../pages/User/UserTransactionForm";
+import Tasks from "../pages/Tasks/Tasks";
+import UserTasks from "../pages/User/UserTasks";
+import TaskBoard from "../pages/TaskBoard/TaskBoard";
 
 const routers = createBrowserRouter([
   {
@@ -61,6 +64,18 @@ const routers = createBrowserRouter([
       {
         path: 'users/:userId/details/edit/:transactionId',
         element: <UserTransactionForm/>
+      },
+      {
+        path: 'users/:id/tasks',
+        element: <UserTasks/>
+      },
+      {
+        path: 'tasks',
+        element: <Tasks/>
+      },
+      {
+        path: '/taskboard',
+        element: <TaskBoard/>
       }
     ]
   }

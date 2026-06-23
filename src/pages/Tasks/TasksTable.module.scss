@@ -1,0 +1,20 @@
+@import '../../styles/variables';
+
+.tableWrapper {
+  :global {
+    .ant-table-thead > tr > th {
+      background: $bg-primary;
+      font-weight: 600;
+    }
+
+    .ant-table-tbody > tr.ant-table-row:hover > td,
+    .ant-table-tbody > tr > td.ant-table-cell-row-hover {
+      background-color: rgba($primary-color, 0.08) !important;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+.editButton {
+  color: $primary-color;
+}

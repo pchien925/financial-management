@@ -1,5 +1,5 @@
 import { Table, Tag, Button, Popconfirm, Space, Tooltip, Avatar } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, CarryOutOutlined } from '@ant-design/icons';
 import {
   DEPARTMENTS,
   USER_STATUS,
@@ -7,7 +7,7 @@ import {
 } from '../../constants/userConstants';
 import styles from './UserTable.module.scss';
 
-function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, onViewDetails }) {
+function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, onViewDetails, onViewTasks }) {
   const columns = [
     {
       title: 'Ảnh đại diện',
@@ -91,7 +91,9 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
     {
       title: 'Hành động',
       key: 'action',
-      width: 150,
+      width: 200,
+      align: 'center',
+      fixed: 'right',
       render: (_, record) => (
         <Space>
           <Tooltip title="Sửa">
@@ -123,6 +125,11 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
             onClick={() => onViewDetails(record)}
             />
           </Tooltip>
+          <Tooltip title= "Xem danh sách công việc">
+            <Button type='text' icon={<CarryOutOutlined />} style={{ color: 'blue' }}
+            onClick={() => onViewTasks(record)}
+            />
+          </Tooltip>
         </Space>
       ),
     },
@@ -134,6 +141,7 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
         columns={columns}
         dataSource={dataSource}
         rowKey="id"
+        scroll={{ x: 'max-content' }}
         pagination={{
           current: currentPage,
           pageSize: 6,
