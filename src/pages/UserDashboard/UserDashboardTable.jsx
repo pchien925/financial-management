@@ -6,73 +6,104 @@ import {
   USER_STATUS,
   USER_STATUS_LABELS,
 } from '../../constants/userConstants';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
-const columns = [
-  {
-    title: 'Họ và tên',
-    dataIndex: 'name',
-    key: 'name',
-    width: 200,
-    ellipsis: true,
+
+const messages = defineMessages({
+  danhSachNguoiDung: {
+    defaultMessage: 'Danh sách người dùng'
   },
-  {
-    title: 'Nghề nghiệp',
-    dataIndex: 'occupation',
-    key: 'occupation',
-    width: 140,
-    render: (occupation) => {
-      const found = DEPARTMENTS.find((dep) => dep.value === occupation);
-      return found ? found.label : occupation;
-    },
+  hoVaTen: {
+    defaultMessage: 'Họ và tên'
   },
-  {
-    title: 'Chức vụ',
-    dataIndex: 'position',
-    key: 'position',
-    width: 160,
-    ellipsis: true,
+  ngheNghiep: {
+    defaultMessage: 'Nghề nghiệp'
   },
-  {
-    title: 'Trạng thái',
-    dataIndex: 'status',
-    key: 'status',
-    width: 140,
-    render: (status) => {
-      const isActive = status === USER_STATUS.ACTIVE;
-      return (
-        <Tag color={isActive ? 'success' : 'error'}>
-          {USER_STATUS_LABELS[status]}
-        </Tag>
-      );
-    },
+  chucVu: {
+    defaultMessage: 'Chức vụ'
   },
-  { 
-    title: 'Ngày tạo', 
-    dataIndex: 'joinDate', 
-    key: 'joinDate', 
-    width: 130,
-    render: (text) => {
-      if (!text) return '';
-      const parts = text.split('-');
-      if (parts.length === 3) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-      return text;
-    },
+  trangThai: {
+    defaultMessage: 'Trạng thái'
   },
-];
+  ngayTao: {
+    defaultMessage: 'Ngày tạo'
+  },
+  tongTotalNguoiDung: {
+    defaultMessage: 'Tổng {total} người dùng'
+  }
+});
+
 
 const UserDashboardTable = ({ dataSource }) => {
+  const intl = useIntl();
+  const translatedDepartments = DEPARTMENTS.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
+  const translatedUserStatusLabels = Object.keys(USER_STATUS_LABELS).reduce((acc, key) => { acc[key] = intl.formatMessage({ id: `app.constant.${key}`, defaultMessage: USER_STATUS_LABELS[key] }); return acc; }, {});
+
+  const columns = [
+    {
+      title: intl.formatMessage(messages.hoVaTen),
+      dataIndex: 'name',
+      key: 'name',
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: intl.formatMessage(messages.ngheNghiep),
+      dataIndex: 'occupation',
+      key: 'occupation',
+      width: 140,
+      render: (occupation) => {
+        const found = translatedDepartments.find((dep) => dep.value === occupation);
+        return found ? found.label : occupation;
+      },
+    },
+    {
+      title: intl.formatMessage(messages.chucVu),
+      dataIndex: 'position',
+      key: 'position',
+      width: 160,
+      ellipsis: true,
+    },
+    {
+      title: intl.formatMessage(messages.trangThai),
+      dataIndex: 'status',
+      key: 'status',
+      width: 140,
+      render: (status) => {
+        const isActive = status === USER_STATUS.ACTIVE;
+        return (
+          <Tag color={isActive ? 'success' : 'error'}>
+            {translatedUserStatusLabels[status]}
+          </Tag>
+        );
+      },
+    },
+    { 
+      title: intl.formatMessage(messages.ngayTao), 
+      dataIndex: 'joinDate', 
+      key: 'joinDate', 
+      width: 130,
+      render: (text) => {
+        if (!text) return '';
+        const parts = text.split('-');
+        if (parts.length === 3) {
+          return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return text;
+      },
+    },
+  ];
+
   return (
     <div className={styles.tableSection}>
-      <h4 className={styles.tableSectionTitle}>Danh sách người dùng</h4>
+      <h4 className={styles.tableSectionTitle}><FormattedMessage {...messages.danhSachNguoiDung}  /></h4>
       <Table 
         columns={columns} 
         dataSource={dataSource} 
         rowKey="id"
         pagination={{ 
           pageSize: 5,
-          showTotal: (total) => `Tổng ${total} người dùng`,
+          showTotal: (total) => intl.formatMessage(messages.tongTotalNguoiDung, { total }),
         }}
       />
     </div>

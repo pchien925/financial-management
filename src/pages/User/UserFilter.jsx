@@ -7,6 +7,27 @@ import styles from './UserFilter.module.scss';
 import { DatePicker, Typography } from 'antd';
 import dayjs from 'dayjs';
 import { statusOptions } from '../../constants/userConstants';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+
+
+const messages = defineMessages({
+  locTheoThoiGian: {
+    defaultMessage: 'Lọc theo thời gian:'
+  },
+  timTheoTenNguoiDung: {
+    defaultMessage: 'Tìm theo tên người dùng...'
+  },
+  chonNgheNghiep: {
+    defaultMessage: 'Chọn nghề nghiệp'
+  },
+  tuNgay: {
+    defaultMessage: 'Từ ngày'
+  },
+  denNgay: {
+    defaultMessage: 'Đến ngày'
+  }
+});
+
 
 const { RangePicker } = DatePicker;
 
@@ -21,14 +42,18 @@ function UserFilter({
   onDateChange,
   valueDateRange
 }) {
+  const intl = useIntl();
+  const translatedDepartments = DEPARTMENTS.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
+  const translatedStatusOptions = statusOptions.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
 
   const rangeValue = valueDateRange && valueDateRange[0] && valueDateRange[1]
     ? [dayjs(valueDateRange[0]), dayjs(valueDateRange[1])]
     : null;
 
   const options = user
-    .filter(user => user.name.toLowerCase().includes(searchText.toLowerCase()))
-    .map(user => ({ value: user.name, label: user.name }));
+    .filter(u => u.name.toLowerCase().includes(searchText.toLowerCase()))
+    .map(u => ({ value: u.name, label: u.name }));
+    
   return (
     <div className={styles.filterWrapper}>
       <Space wrap size="middle">
@@ -37,36 +62,35 @@ function UserFilter({
           value={searchText}
           onChange={(value) => onSearchChange(value)}
           onSelect={(value) => onSearchChange(value)}
-          placeholder="Tìm theo tên người dùng..."
+          placeholder={intl.formatMessage(messages.timTheoTenNguoiDung)}
           allowClear
         >
           <Input prefix={<SearchOutlined />} className={styles.searchInput} />
         </AutoComplete>
         <Radio.Group
-          options={statusOptions}
+          options={translatedStatusOptions}
           value={filterStatus}
           onChange={(e) => onStatusChange(e.target.value)}
           optionType="button"
           buttonStyle="solid"
         />
         <Select
-          placeholder="Chọn nghề nghiệp"
+          placeholder={intl.formatMessage(messages.chonNgheNghiep)}
           allowClear
-          options={DEPARTMENTS}
+          options={translatedDepartments}
           className={styles.occupationSelect}
           value={filterOccupation}
           onChange={(value) => onOccupationChange(value || null)}
         />
-        <Typography.Text strong>Lọc theo thời gian:</Typography.Text>
+        <Typography.Text strong><FormattedMessage {...messages.locTheoThoiGian}  /></Typography.Text>
         <RangePicker
           onChange={onDateChange}
           format="DD-MM-YYYY"
-          placeholder={['Từ ngày', 'Đến ngày']}
+          placeholder={[intl.formatMessage(messages.tuNgay), intl.formatMessage(messages.denNgay)]}
           value={rangeValue}
         />
       </Space>
     </div>
   );
 }
-
 export default UserFilter;

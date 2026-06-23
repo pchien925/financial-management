@@ -9,10 +9,61 @@ import {
 import styles from './FinanceTable.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteTransaction } from '../../redux/features/finance/financeSlice';
+import { useIntl, defineMessages } from 'react-intl';
+
+
+const messages = defineMessages({
+  nguoiDung: {
+    defaultMessage: 'Người dùng'
+  },
+  khongXacDinh: {
+    defaultMessage: 'Không xác định'
+  },
+  ghiChu: {
+    defaultMessage: 'Ghi chú'
+  },
+  soTien: {
+    defaultMessage: 'Số tiền'
+  },
+  loai: {
+    defaultMessage: 'Loại'
+  },
+  danhMuc: {
+    defaultMessage: 'Danh mục'
+  },
+  ngay: {
+    defaultMessage: 'Ngày'
+  },
+  hanhDong: {
+    defaultMessage: 'Hành động'
+  },
+  sua: {
+    defaultMessage: 'Sửa'
+  },
+  xoaGiaoDich: {
+    defaultMessage: 'Xóa giao dịch'
+  },
+  banCoChacMuonXoaGiaoDichNay: {
+    defaultMessage: 'Bạn có chắc muốn xóa giao dịch này?'
+  },
+  xoa: {
+    defaultMessage: 'Xóa'
+  },
+  huy: {
+    defaultMessage: 'Hủy'
+  },
+  tongTotalGiaoDich: {
+    defaultMessage: 'Tổng {total} giao dịch'
+  }
+});
+
 
 function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClick }) {
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state.user);
+  const intl = useIntl();
+  const translatedTypeLabels = Object.keys(TRANSACTION_TYPE_LABELS).reduce((acc, key) => { acc[key] = intl.formatMessage({ id: `app.constant.${key}`, defaultMessage: TRANSACTION_TYPE_LABELS[key] }); return acc; }, {});
+  const translatedCategories = CATEGORIES.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
 
   const handleEdit = (record) => {
     onEdit(record);
@@ -24,23 +75,23 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
 
   const columns = [
     {
-      title: 'Người dùng',
+      title: intl.formatMessage(messages.nguoiDung),
       dataIndex: 'userId',
       key: 'userName',
       width: 140,
       render: (userId) => {
         const found = users.find((u) => u.id === userId);
-        return found ? found.name : 'Không xác định';
+        return found ? found.name : intl.formatMessage(messages.khongXacDinh);
       },
     },
     {
-      title: 'Ghi chú',
+      title: intl.formatMessage(messages.ghiChu),
       dataIndex: 'note',
       key: 'note',
       ellipsis: true,
     },
     {
-      title: 'Số tiền',
+      title: intl.formatMessage(messages.soTien),
       dataIndex: 'amount',
       key: 'amount',
       sorter: (a, b) => a.amount - b.amount,
@@ -48,7 +99,10 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
         const isIncome = record.type === TRANSACTION_TYPES.INCOME;
         const color = TRANSACTION_TYPE_COLORS[record.type];
         const prefix = isIncome ? '+' : '-';
-        const formatted = amount.toLocaleString('vi-VN');
+        const formatted = intl.formatNumber(amount, {
+          style: 'currency',
+          currency: intl.locale === 'en' ? 'USD' : 'VND',
+        });
         return (
           <span
             className={isIncome ? styles.incomeAmount : styles.expenseAmount}
@@ -60,7 +114,7 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
       },
     },
     {
-      title: 'Loại',
+      title: intl.formatMessage(messages.loai),
       dataIndex: 'type',
       key: 'type',
       width: 120,
@@ -68,23 +122,23 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
         const isIncome = type === TRANSACTION_TYPES.INCOME;
         return (
           <Tag color={isIncome ? 'success' : 'error'}>
-            {TRANSACTION_TYPE_LABELS[type]}
+            {translatedTypeLabels[type]}
           </Tag>
         );
       },
     },
     {
-      title: 'Danh mục',
+      title: intl.formatMessage(messages.danhMuc),
       dataIndex: 'category',
       key: 'category',
       width: 140,
       render: (category) => {
-        const found = CATEGORIES.find((cat) => cat.value === category);
+        const found = translatedCategories.find((cat) => cat.value === category);
         return found ? found.label : category;
       },
     },
     {
-      title: 'Ngày',
+      title: intl.formatMessage(messages.ngay),
       dataIndex: 'date',
       key: 'date',
       width: 130,
@@ -99,14 +153,14 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
       },
     },
     {
-      title: 'Hành động',
+      title: intl.formatMessage(messages.hanhDong),
       key: 'action',
       width: 150,
       align: 'center',
       fixed: 'right',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Sửa">
+          <Tooltip title={intl.formatMessage(messages.sua)}>
             <Button
               type="text"
               icon={<EditOutlined />}
@@ -115,14 +169,14 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
             />
           </Tooltip>
           <Popconfirm
-            title="Xóa giao dịch"
-            description="Bạn có chắc muốn xóa giao dịch này?"
-            okText="Xóa"
-            cancelText="Hủy"
+            title={intl.formatMessage(messages.xoaGiaoDich)}
+            description={intl.formatMessage(messages.banCoChacMuonXoaGiaoDichNay)}
+            okText={intl.formatMessage(messages.xoa)}
+            cancelText={intl.formatMessage(messages.huy)}
             okButtonProps={{ danger: true }}
             onConfirm={() => handleDelete(record)}
           >
-            <Tooltip title="Xóa">
+            <Tooltip title={intl.formatMessage(messages.xoa)}>
               <Button
                 type="text"
                 danger
@@ -149,7 +203,7 @@ function FinanceTable({ dataSource, onEdit, currentPage, onPageChange, onRowClic
           current: currentPage,
           pageSize: 6,
           showSizeChanger: false,
-          showTotal: (total) => `Tổng ${total} giao dịch`,
+          showTotal: (total) => intl.formatMessage(messages.tongTotalGiaoDich, { total }),
           onChange: onPageChange,
         }}
       />

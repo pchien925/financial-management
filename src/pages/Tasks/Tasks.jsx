@@ -10,9 +10,24 @@ import dayjs from 'dayjs';
 import { DAYS_OF_WEEK } from '../../constants/tasksConstants';
 import { addTask, updateTask, deleteTask, reorderTasks } from '../../redux/features/tasks/tasksSlice';
 import { useSearchParams } from 'react-router-dom';
+import { FormattedMessage, defineMessages } from 'react-intl';
+import { useIntl } from 'react-intl';
+
+
+const messages = defineMessages({
+  quanLyCongViec: {
+    defaultMessage: 'Quản lý công việc'
+  },
+  themCongViec: {
+    defaultMessage: 'Thêm công việc'
+  }
+});
+
 
 function Tasks() {
   const dispatch = useDispatch();
+  const intl = useIntl();
+  const translatedDaysOfWeek = DAYS_OF_WEEK.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value}`, defaultMessage: item.label?.defaultMessage || item.label || item.value }) }));
   const { tasks } = useSelector((state) => state.tasks);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,7 +40,7 @@ function Tasks() {
   // Tạo tab items dựa trên DAYS_OF_WEEK và tasks
   // Sử dụng useMemo để tránh tính toán lại không cần thiết khi tasks thay đổi
   const tabItems = useMemo(() => {
-    return DAYS_OF_WEEK.map((day) => ({
+    return translatedDaysOfWeek.map((day) => ({
       key: day.value,
       label: day.label,
       children: (
@@ -40,7 +55,7 @@ function Tasks() {
       />
     ),
   }));
-}, [tasks, dispatch])
+}, [tasks, dispatch, translatedDaysOfWeek])
 
   // Cập nhật URL khi thay đổi tab
   const handleTabChange = (key) => {
@@ -48,7 +63,7 @@ function Tasks() {
   };
 
   const handleAddTask = (newTask) => {
-    dispatch(addTask({ ...newTask, createdAt: dayjs().format('YYYY-MM-DD'), dayOfWeek: activeDay }));
+    dispatch(addTask({ ...newTask, createdAt: dayjs().format('YYYY-MM-DD'), dayOfWeek: activeDay, status: 'todo' }));
     setIsAddFormOpen(false);
   };
 
@@ -58,27 +73,26 @@ function Tasks() {
     setEditingTask(null);
   };
 
-return (
-  <div className={styles.tasksWrapper}>
-    <div className={styles.toolbar}>
-      <h2 className={styles.pageTitle}>Quản lý công việc</h2>
-    </div>
-
-    <Tabs
-      activeKey={activeDay}
-      onChange={handleTabChange}
-      items={tabItems}
-      className={styles.dayTabs}
-      tabBarExtraContent={
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => setIsAddFormOpen(true)}
-        >
-          Thêm công việc
-        </Button>
-      }
-    />
+  return (
+    <div className={styles.tasksWrapper}>
+      <div className={styles.header}>
+        <h2 className={styles.pageTitle}><FormattedMessage {...messages.quanLyCongViec}  /></h2>
+        <Tabs
+        activeKey={activeDay}
+        onChange={handleTabChange}
+        items={tabItems}
+        className={styles.dayTabs}
+        tabBarExtraContent={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setIsAddFormOpen(true)}
+          >
+            <FormattedMessage {...messages.themCongViec}  />
+          </Button>
+        }
+      />
+      </div>
 
     <TasksForm
       open={isAddFormOpen}
@@ -86,16 +100,16 @@ return (
       onSubmit={handleAddTask}
     />
 
-    <TasksUpdateModal
-      open={isUpdateModalOpen}
-      task={editingTask}
-      onCancel={() => {
-        setIsUpdateModalOpen(false);
-        setEditingTask(null);
-      }}
-      onSubmit={handleUpdateTask}
-      daysOfWeek={DAYS_OF_WEEK}
-    />
+      <TasksUpdateModal
+        open={isUpdateModalOpen}
+        task={editingTask}
+        onCancel={() => {
+          setIsUpdateModalOpen(false);
+          setEditingTask(null);
+        }}
+        onSubmit={handleUpdateTask}
+        daysOfWeek={translatedDaysOfWeek}
+      />
   </div>
 );
 }

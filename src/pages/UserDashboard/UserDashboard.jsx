@@ -5,6 +5,14 @@ import UserDashboardTable from './UserDashboardTable';
 import styles from './UserDashboard.module.scss';
 import { USER_STATUS } from '../../constants/userConstants';
 import UserDashboardFilter from './UserDashBoardFilter'
+import { FormattedMessage, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  thongKeNguoiDung: {
+    defaultMessage: 'Thống kê người dùng'
+  }
+});
+
 
 const UserDashboard = () => {
   const [dateRange, setDateRange] = React.useState(null);
@@ -43,7 +51,7 @@ const UserDashboard = () => {
 
   return (
     <div className={styles.dashboardWrapper}>
-      <h2 className={styles.pageTitle}>Thống kê người dùng</h2>
+      <h2 className={styles.pageTitle}><FormattedMessage {...messages.thongKeNguoiDung}  /></h2>
       
       <UserDashboardFilter onDateChange={handleDateChange} />
       <UserStatCards 

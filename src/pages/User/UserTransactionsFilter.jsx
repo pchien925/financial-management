@@ -7,6 +7,27 @@ import styles from './UserFilter.module.scss'; // Dùng lại style của UserFi
 import { DatePicker, Typography } from 'antd';
 import dayjs from 'dayjs';
 import { typeOptions } from '../../constants/financeConstants';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+
+
+const messages = defineMessages({
+  locTheoThoiGian: {
+    defaultMessage: 'Lọc theo thời gian:'
+  },
+  timTheoGhiChu: {
+    defaultMessage: 'Tìm theo ghi chú...'
+  },
+  chonDanhMuc: {
+    defaultMessage: 'Chọn danh mục'
+  },
+  tuNgay: {
+    defaultMessage: 'Từ ngày'
+  },
+  denNgay: {
+    defaultMessage: 'Đến ngày'
+  }
+});
+
 const { RangePicker } = DatePicker;
 
 function UserTransactionFilter({
@@ -20,6 +41,10 @@ function UserTransactionFilter({
   onDateChange,
   valueDateRange
 }) {
+  const intl = useIntl();
+  const translatedCategories = CATEGORIES.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
+  const translatedTypeOptions = typeOptions.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
+
   const rangeValue = valueDateRange && valueDateRange[0] && valueDateRange[1]
       ? [dayjs(valueDateRange[0]), dayjs(valueDateRange[1])]
       : null;
@@ -40,31 +65,31 @@ function UserTransactionFilter({
           value={searchText}
           onChange={(value) => onSearchChange(value)}
           onSelect={(value) => onSearchChange(value)}
-          placeholder="Tìm theo ghi chú..."
+          placeholder={intl.formatMessage(messages.timTheoGhiChu)}
           allowClear
         >
           <Input prefix={<SearchOutlined />} />
         </AutoComplete>
         <Radio.Group
-          options={typeOptions}
+          options={translatedTypeOptions}
           value={filterType}
           onChange={(e) => onTypeChange(e.target.value)}
           optionType="button"
           buttonStyle="solid"
         />
         <Select
-          placeholder="Chọn danh mục"
+          placeholder={intl.formatMessage(messages.chonDanhMuc)}
           allowClear
-          options={CATEGORIES}
+          options={translatedCategories}
           className={styles.categorySelect}
           value={filterCategory}
           onChange={(value) => onCategoryChange(value || null)}
         />
-        <Typography.Text strong>Lọc theo thời gian:</Typography.Text>
+        <Typography.Text strong><FormattedMessage {...messages.locTheoThoiGian}  /></Typography.Text>
         <RangePicker
           onChange={onDateChange}
           format="DD-MM-YYYY"
-          placeholder={['Từ ngày', 'Đến ngày']}
+          placeholder={[intl.formatMessage(messages.tuNgay), intl.formatMessage(messages.denNgay)]}
           value={rangeValue}
         />
       </Space>

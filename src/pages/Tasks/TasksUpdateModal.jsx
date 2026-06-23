@@ -2,11 +2,74 @@ import { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, InputNumber } from 'antd';
 import { useSelector } from 'react-redux';
 import styles from './TasksForm.module.scss';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  tenCongViec: {
+    defaultMessage: 'Tên công việc'
+  },
+  thuTrongTuan: {
+    defaultMessage: 'Thứ trong tuần'
+  },
+  thoiGianHtDuKienPhut: {
+    defaultMessage: 'Thời gian HT dự kiến (phút)'
+  },
+  nguoiDung: {
+    defaultMessage: 'Người dùng'
+  },
+  xacNhanHuy: {
+    defaultMessage: 'Xác nhận hủy'
+  },
+  banCoChacMuonHuyCapNhatCongViec: {
+    defaultMessage: 'Bạn có chắc muốn hủy cập nhật công việc?'
+  },
+  dongY: {
+    defaultMessage: 'Đồng ý'
+  },
+  khong: {
+    defaultMessage: 'Không'
+  },
+  capNhatCongViec: {
+    defaultMessage: 'Cập nhật công việc'
+  },
+  capNhat: {
+    defaultMessage: 'Cập nhật'
+  },
+  huy: {
+    defaultMessage: 'Hủy'
+  },
+  vuiLongNhapTenCongViec: {
+    defaultMessage: 'Vui lòng nhập tên công việc!'
+  },
+  nhapTenCongViec: {
+    defaultMessage: 'Nhập tên công việc'
+  },
+  vuiLongChonThu: {
+    defaultMessage: 'Vui lòng chọn thứ!'
+  },
+  chonThu: {
+    defaultMessage: 'Chọn thứ'
+  },
+  vuiLongNhapThoiGian: {
+    defaultMessage: 'Vui lòng nhập thời gian!'
+  },
+  nhapSoPhut: {
+    defaultMessage: 'Nhập số phút'
+  },
+  vuiLongChonNguoiDung: {
+    defaultMessage: 'Vui lòng chọn người dùng!'
+  },
+  chonNguoiDung: {
+    defaultMessage: 'Chọn người dùng'
+  }
+});
+
 
 const { Option } = Select;
 
 function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUserId }) {
   const [form] = Form.useForm();
+  const intl = useIntl();
   const [isChanged, setIsChanged] = useState(false);
   const { users } = useSelector((state) => state.user);
 
@@ -45,10 +108,10 @@ function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUs
   const handleCancel = () => {
     if (isChanged) {
       Modal.confirm({
-        title: 'Xác nhận hủy',
-        content: 'Bạn có chắc muốn hủy cập nhật công việc?',
-        okText: 'Đồng ý',
-        cancelText: 'Không',
+        title: intl.formatMessage(messages.xacNhanHuy),
+        content: intl.formatMessage(messages.banCoChacMuonHuyCapNhatCongViec),
+        okText: intl.formatMessage(messages.dongY),
+        cancelText: intl.formatMessage(messages.khong),
         onOk: () => {
           form.resetFields();
           setIsChanged(false);
@@ -76,12 +139,12 @@ function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUs
 
   return (
     <Modal
-      title="Cập nhật công việc"
+      title={intl.formatMessage(messages.capNhatCongViec)}
       open={open}
       onOk={handleOk}
       onCancel={handleCancel}
-      okText="Cập nhật"
-      cancelText="Hủy"
+      okText={intl.formatMessage(messages.capNhat)}
+      cancelText={intl.formatMessage(messages.huy)}
       okButtonProps={{ disabled: !isChanged }}
       cancelButtonProps={{ className: styles.cancelButton }}
       destroyOnClose
@@ -89,17 +152,17 @@ function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUs
       <Form form={form} layout="vertical" onValuesChange={handleValuesChange}>
         <Form.Item
           name="name"
-          label="Tên công việc"
-          rules={[{ required: true, message: 'Vui lòng nhập tên công việc!' }]}
+          label={<FormattedMessage {...messages.tenCongViec}  />}
+          rules={[{ required: true, message: intl.formatMessage(messages.vuiLongNhapTenCongViec) }]}
         >
-          <Input placeholder="Nhập tên công việc" />
+          <Input placeholder={intl.formatMessage(messages.nhapTenCongViec)} />
         </Form.Item>
         <Form.Item
           name="dayOfWeek"
-          label="Thứ trong tuần"
-          rules={[{ required: true, message: 'Vui lòng chọn thứ!' }]}
+          label={<FormattedMessage {...messages.thuTrongTuan}  />}
+          rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonThu) }]}
         >
-          <Select placeholder="Chọn thứ">
+          <Select placeholder={intl.formatMessage(messages.chonThu)}>
             {daysOfWeek.map((day) => (
               <Option key={day.value} value={day.value}>
                 {day.label}
@@ -109,19 +172,19 @@ function TasksUpdateModal({ open, task, onCancel, onSubmit, daysOfWeek, lockedUs
         </Form.Item>
         <Form.Item
           name="expectedTime"
-          label="Thời gian HT dự kiến (phút)"
-          rules={[{ required: true, message: 'Vui lòng nhập thời gian!' }]}
+          label={<FormattedMessage {...messages.thoiGianHtDuKienPhut}  />}
+          rules={[{ required: true, message: intl.formatMessage(messages.vuiLongNhapThoiGian) }]}
         >
-          <InputNumber min={1} style={{ width: '100%' }} placeholder="Nhập số phút" />
+          <InputNumber min={1} style={{ width: '100%' }} placeholder={intl.formatMessage(messages.nhapSoPhut)} />
         </Form.Item>
         <Form.Item
-          label="Người dùng"
+          label={<FormattedMessage {...messages.nguoiDung}  />}
           name="userId"
-          rules={[{ required: true, message: 'Vui lòng chọn người dùng!' }]}
+          rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonNguoiDung) }]}
         >
           <Select
             showSearch={!lockedUserId}
-            placeholder="Chọn người dùng"
+            placeholder={intl.formatMessage(messages.chonNguoiDung)}
             options={userOptions}
             filterOption={(input, option) => option.label.toLowerCase().includes(input.toLowerCase())}
             disabled={!!lockedUserId}

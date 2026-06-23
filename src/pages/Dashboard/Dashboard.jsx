@@ -4,6 +4,14 @@ import DashBoardFilter from './DashBoardFilter';
 import DashBoardTable from './DashBoardTable';
 import styles from './Dashboard.module.scss';
 import { useSelector } from 'react-redux';
+import { FormattedMessage, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  thongKeChiTieu: {
+    defaultMessage: 'Thống kê chi tiêu'
+  }
+});
+
 
 const Dashboard = () => {
   const [dateRange, setDateRange] = useState(null);
@@ -34,7 +42,7 @@ const Dashboard = () => {
 
   return (
     <div className={styles.dashboardWrapper}>
-      <h2 className={styles.pageTitle}>Thống kê chi tiêu</h2>
+      <h2 className={styles.pageTitle}><FormattedMessage {...messages.thongKeChiTieu}  /></h2>
       
       <DashBoardFilter onDateChange={handleDateChange} />
       

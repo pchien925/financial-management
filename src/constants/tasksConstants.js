@@ -1,22 +1,24 @@
-// Danh sách các thứ trong tuần
+// src/constants/tasksConstants.js
+
+// Danh sách các thứ trong tuần (Đã bọc để Babel quét tự sinh ID)
 export const DAYS_OF_WEEK = [
-  { value: '2', label: 'Thứ 2' },
-  { value: '3', label: 'Thứ 3' },
-  { value: '4', label: 'Thứ 4' },
-  { value: '5', label: 'Thứ 5' },
-  { value: '6', label: 'Thứ 6' },
-  { value: '7', label: 'Thứ 7' },
-  { value: '8', label: 'Chủ nhật' },
+  { value: '2', label: { defaultMessage: 'Thứ 2' } },
+  { value: '3', label: { defaultMessage: 'Thứ 3' } },
+  { value: '4', label: { defaultMessage: 'Thứ 4' } },
+  { value: '5', label: { defaultMessage: 'Thứ 5' } },
+  { value: '6', label: { defaultMessage: 'Thứ 6' } },
+  { value: '7', label: { defaultMessage: 'Thứ 7' } },
+  { value: '8', label: { defaultMessage: 'Chủ nhật' } },
 ];
 
+// Cấu hình các cột Kanban (Đã đổi label/title thành dạng object tĩnh)
 export const COLUMNS = [
-  { id: 'todo', title: 'Cần làm' },
-  { id: 'inProgress', title: 'Đang làm' },
-  { id: 'done', title: 'Đã xong' },
+  { id: 'todo', title: { defaultMessage: 'Cần làm' } },
+  { id: 'inProgress', title: { defaultMessage: 'Đang làm' } },
+  { id: 'done', title: { defaultMessage: 'Đã xong' } },
 ];
 
-
-// Dữ liệu công việc mẫu
+// Dữ liệu công việc mẫu (Giữ nguyên chuỗi vì phần dữ liệu này hiển thị động theo data của user)
 export const DEFAULT_TASKS = [
   // User 1: Nguyễn Văn An
   { id: 1, userId: 1, name: 'Làm báo cáo tuần', expectedTime: 45, createdAt: '2026-06-16', dayOfWeek: '2', status: 'todo' },

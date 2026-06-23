@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Input, Select, Radio, DatePicker, Button, Card, Row, Col, Modal, Upload, message } from 'antd';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import {LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import {LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -13,17 +13,102 @@ import {
 } from '../../constants/userConstants';
 import { addUser, updateUser } from '../../redux/features/user/userSlice';
 import styles from './UserForm.module.scss';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
 
-const statusRadioOptions = [
-  {
-    value: USER_STATUS.ACTIVE,
-    label: USER_STATUS_LABELS[USER_STATUS.ACTIVE],
+
+const messages = defineMessages({
+  taiLen: {
+    defaultMessage: 'Tải lên'
   },
-  {
-    value: USER_STATUS.INACTIVE,
-    label: USER_STATUS_LABELS[USER_STATUS.INACTIVE],
+  hoVaTen: {
+    defaultMessage: 'Họ và tên'
   },
-];
+  soDienThoai: {
+    defaultMessage: 'Số điện thoại'
+  },
+  ngheNghiep: {
+    defaultMessage: 'Nghề nghiệp'
+  },
+  chucVu: {
+    defaultMessage: 'Chức vụ'
+  },
+  trangThai: {
+    defaultMessage: 'Trạng thái'
+  },
+  ngayTao: {
+    defaultMessage: 'Ngày tạo'
+  },
+  huy: {
+    defaultMessage: 'Hủy'
+  },
+  capNhat: {
+    defaultMessage: 'Cập nhật'
+  },
+  themMoi: {
+    defaultMessage: 'Thêm mới'
+  },
+  taiAnhLenThanhCong: {
+    defaultMessage: 'Tải ảnh lên thành công!'
+  },
+  taiAnhLenThatBai: {
+    defaultMessage: 'Tải ảnh lên thất bại !'
+  },
+  banCoMuonDongTrangNay: {
+    defaultMessage: 'Bạn có muốn đóng trang này?'
+  },
+  co: {
+    defaultMessage: 'Có'
+  },
+  chinhSuaNguoiDung: {
+    defaultMessage: 'Chỉnh sửa người dùng'
+  },
+  themNguoiDungMoi: {
+    defaultMessage: 'Thêm người dùng mới'
+  },
+  vuiLongNhapHoTen: {
+    defaultMessage: 'Vui lòng nhập họ tên!'
+  },
+  vdNguyenVanA: {
+    defaultMessage: 'VD: Nguyễn Văn A'
+  },
+  vuiLongNhapEmail: {
+    defaultMessage: 'Vui lòng nhập email!'
+  },
+  emailKhongHopLe: {
+    defaultMessage: 'Email không hợp lệ!'
+  },
+  vdNguyenvanacompanycom: {
+    defaultMessage: 'VD: nguyenvana@company.com'
+  },
+  vuiLongNhapSoDienThoai: {
+    defaultMessage: 'Vui lòng nhập số điện thoại!'
+  },
+  vd0901234567: {
+    defaultMessage: 'VD: 0901234567'
+  },
+  vuiLongChonNgheNghiep: {
+    defaultMessage: 'Vui lòng chọn nghề nghiệp!'
+  },
+  chonNgheNghiep: {
+    defaultMessage: 'Chọn nghề nghiệp'
+  },
+  vuiLongNhapChucVu: {
+    defaultMessage: 'Vui lòng nhập chức vụ!'
+  },
+  vdSeniorDeveloper: {
+    defaultMessage: 'VD: Senior Developer'
+  },
+  vuiLongChonTrangThai: {
+    defaultMessage: 'Vui lòng chọn trạng thái!'
+  },
+  vuiLongChonNgay: {
+    defaultMessage: 'Vui lòng chọn ngày!'
+  },
+  chonNgay: {
+    defaultMessage: 'Chọn ngày'
+  }
+});
+
 
 function UserForm() {
   const { id } = useParams();
@@ -31,12 +116,27 @@ function UserForm() {
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const intl = useIntl();
+  const translatedDepartments = DEPARTMENTS.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value || item}`, defaultMessage: item.label || item }) }));
+  const translatedStatusLabels = Object.keys(USER_STATUS_LABELS).reduce((acc, key) => { acc[key] = intl.formatMessage({ id: `app.constant.${key}`, defaultMessage: USER_STATUS_LABELS[key] }); return acc; }, {});
+
+  const statusRadioOptions = [
+    {
+      value: USER_STATUS.ACTIVE,
+      label: translatedStatusLabels[USER_STATUS.ACTIVE],
+    },
+    {
+      value: USER_STATUS.INACTIVE,
+      label: translatedStatusLabels[USER_STATUS.INACTIVE],
+    },
+  ];
 
   const { users } = useSelector((state) => state.user);
   const [isChanged, setIsChanged] = useState(false);
   const [initialValues, setInitialValues] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [fileList, setFileList] = useState([]);
 
   const isUpdate = Boolean(id);
 
@@ -50,20 +150,18 @@ function UserForm() {
       if (record) {
         setInitialValues(record);
         form.setFieldsValue(record);
-        setAvatarUrl(record.avatarUrl);
+        setImageUrl(record.avatarUrl);
       } else {
         navigate(`/users?${searchParams.toString()}`);
       }
     } else {
       setInitialValues({});
       form.resetFields();
-      setAvatarUrl('');
+      setImageUrl('');
     }
   }, [id, users, form, isUpdate, navigate, searchParams]);
 
-  // Hàm custom upload cho Ant Design Upload component, sử dụng Cloudinary để lưu ảnh
   const customUpload = async ({ file, onSuccess, onError }) => {
-    // Tạo form data để gửi file ảnh lên Cloudinary
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', UPLOAD_PRESET);
@@ -72,14 +170,15 @@ function UserForm() {
       setAvatarLoading(true);
       const rs = await axios.post(UPLOAD_URL, formData);
       const url = rs.data.secure_url;
-      setAvatarUrl(url);
+      setImageUrl(url);
+      setFileList([{ uid: '-1', name: 'avatar.png', status: 'done', url }]);
       form.setFieldValue('avatarUrl', url);
-      setIsChanged(true); // Đánh dấu có thay đổi để bật nút submit
+      setIsChanged(true);
       onSuccess(rs.data, file);
-      message.success('Tải ảnh lên thành công!');
+      message.success(intl.formatMessage(messages.taiAnhLenThanhCong));
     } catch (error) {
       onError(error);
-      message.error('Tải ảnh lên thất bại !');
+      message.error(intl.formatMessage(messages.taiAnhLenThatBai));
     } finally {
       setAvatarLoading(false);
     }
@@ -119,9 +218,9 @@ function UserForm() {
 
   const handleCancel = () => {
     Modal.confirm({
-      title: 'Bạn có muốn đóng trang này?',
-      okText: 'Có',
-      cancelText: 'Hủy',
+      title: intl.formatMessage(messages.banCoMuonDongTrangNay),
+      okText: intl.formatMessage(messages.co),
+      cancelText: intl.formatMessage(messages.huy),
       onOk: () => {
         navigate(`/users?${searchParams.toString()}`);
       }
@@ -139,15 +238,15 @@ function UserForm() {
 
   const uploadButton = (
     <div>
-      {avatarLoading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Tải lên</div>
+      <UploadOutlined />
+      <div style={{ marginTop: 8 }}><FormattedMessage {...messages.taiLen}  /></div>
     </div>
   );
 
   return (
     <div className={styles.formPageWrapper}>
       <Card
-        title={isUpdate ? 'Chỉnh sửa người dùng' : 'Thêm người dùng mới'}
+        title={isUpdate ? intl.formatMessage(messages.chinhSuaNguoiDung) : intl.formatMessage(messages.themNguoiDungMoi)}
         className={styles.formCard}
       >
         <Form
@@ -158,23 +257,18 @@ function UserForm() {
           onValuesChange={handleValuesChange}
         >
           <Row gutter={24}>
-            <Col span={24} style={{ display: 'flex', justifyContent: 'left', marginBottom: 20 }}>
+            <Col span={24} className={styles.avatarCol}>
               <Form.Item name="avatarUrl" label="Avatar">
-                {/* ImgCrop với aspect={1/1} ép cắt ảnh hình vuông */}
                 <ImgCrop rotationSlider aspect={1 / 1} cropperProps={{ grid: true}}>
                   <Upload
-                    name="file"
-                    listType="picture-card" // Tạo hình thức ô upload hình vuông
+                    name="avatar"
+                    listType="picture-circle"
+                    className="avatar-uploader"
                     showUploadList={false}
                     customRequest={customUpload}
-                    accept="image/*"
                   >
-                    {avatarUrl ? (
-                      <img
-                        src={avatarUrl}
-                        alt="avatar"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                    {imageUrl ? (
+                      <img src={imageUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                     ) : (
                       uploadButton
                     )}
@@ -182,13 +276,14 @@ function UserForm() {
                 </ImgCrop>
               </Form.Item>
             </Col>
+
             <Col span={12}>
               <Form.Item
-                label="Họ và tên"
+                label={<FormattedMessage {...messages.hoVaTen}  />}
                 name="name"
-                rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongNhapHoTen) }]}
               >
-                <Input placeholder="VD: Nguyễn Văn A" />
+                <Input placeholder={intl.formatMessage(messages.vdNguyenVanA)} />
               </Form.Item>
             </Col>
 
@@ -197,49 +292,49 @@ function UserForm() {
                 label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: 'Vui lòng nhập email!' },
-                  { type: 'email', message: 'Email không hợp lệ!' },
+                  { required: true, message: intl.formatMessage(messages.vuiLongNhapEmail) },
+                  { type: 'email', message: intl.formatMessage(messages.emailKhongHopLe) },
                 ]}
               >
-                <Input placeholder="VD: nguyenvana@company.com" />
+                <Input placeholder={intl.formatMessage(messages.vdNguyenvanacompanycom)} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label="Số điện thoại"
+                label={<FormattedMessage {...messages.soDienThoai}  />}
                 name="phone"
-                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongNhapSoDienThoai) }]}
               >
-                <Input placeholder="VD: 0901234567" />
+                <Input placeholder={intl.formatMessage(messages.vd0901234567)} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label="Nghề nghiệp"
+                label={<FormattedMessage {...messages.ngheNghiep}  />}
                 name="occupation"
-                rules={[{ required: true, message: 'Vui lòng chọn nghề nghiệp!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonNgheNghiep) }]}
               >
-                <Select placeholder="Chọn nghề nghiệp" options={DEPARTMENTS} />
+                <Select placeholder={intl.formatMessage(messages.chonNgheNghiep)} options={translatedDepartments} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label="Chức vụ"
+                label={<FormattedMessage {...messages.chucVu}  />}
                 name="position"
-                rules={[{ required: true, message: 'Vui lòng nhập chức vụ!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongNhapChucVu) }]}
               >
-                <Input placeholder="VD: Senior Developer" />
+                <Input placeholder={intl.formatMessage(messages.vdSeniorDeveloper)} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
               <Form.Item
-                label="Trạng thái"
+                label={<FormattedMessage {...messages.trangThai}  />}
                 name="status"
-                rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonTrangThai) }]}
               >
                 <Radio.Group
                   options={statusRadioOptions}
@@ -251,23 +346,23 @@ function UserForm() {
 
             <Col span={12}>
               <Form.Item
-                label="Ngày tạo"
+                label={<FormattedMessage {...messages.ngayTao}  />}
                 name="joinDate"
-                rules={[{ required: true, message: 'Vui lòng chọn ngày!' }]}
+                rules={[{ required: true, message: intl.formatMessage(messages.vuiLongChonNgay) }]}
                 getValueFromEvent={(date) => date ? date.format('YYYY-MM-DD') : ''}
                 getValueProps={(value) => ({ value: value ? dayjs(value) : null })}
               >
-                <DatePicker format="DD-MM-YYYY" style={{ width: '100%' }} placeholder="Chọn ngày" />
+                <DatePicker format="DD-MM-YYYY" style={{ width: '100%' }} placeholder={intl.formatMessage(messages.chonNgay)} />
               </Form.Item>
             </Col>
           </Row>
 
           <div className={styles.buttonGroup}>
             <Button className={styles.cancelButton} onClick={handleCancel}>
-              Hủy
+              <FormattedMessage {...messages.huy}  />
             </Button>
             <Button type="primary" htmlType="submit" disabled={!isChanged}>
-              {isUpdate ? 'Cập nhật' : 'Thêm mới'}
+              {isUpdate ? <FormattedMessage {...messages.capNhat}  /> : <FormattedMessage {...messages.themMoi}  />}
             </Button>
           </div>
         </Form>

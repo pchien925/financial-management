@@ -5,11 +5,38 @@ import { useSelector } from 'react-redux';
 import { HolderOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 import styles from './TaskBoard.module.scss';
+import { useIntl, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  chuaCoNguoiThucHien: {
+    defaultMessage: 'Chưa có người thực hiện'
+  },
+  xacNhanXoa: {
+    defaultMessage: 'Xác nhận xóa'
+  },
+  xoa: {
+    defaultMessage: 'Xóa'
+  },
+  huy: {
+    defaultMessage: 'Hủy'
+  },
+  keoDeDiChuyen: {
+    defaultMessage: 'Kéo để di chuyển'
+  },
+  xoaCongViec: {
+    defaultMessage: 'Xóa công việc'
+  },
+  banCoChacMuonXoaCongViecName: {
+    defaultMessage: 'Bạn có chắc muốn xóa công việc "{name}"?'
+  }
+});
+
 
 function BoardCard({ task, onDelete }) {
     const { users } = useSelector((state) => state.user);
+    const intl = useIntl();
     const assignedUser = users.find((u) => u.id === task.userId);
-    const userName = assignedUser ? assignedUser.name : 'Chưa có người thực hiện';
+    const userName = assignedUser ? assignedUser.name : intl.formatMessage(messages.chuaCoNguoiThucHien);
     const timeString = task.expectedTime ? `${Number((task.expectedTime / 60).toFixed(2))}h` : '--';
 
     const {
@@ -35,10 +62,10 @@ function BoardCard({ task, onDelete }) {
     const handleDeleteClick = (e) => {
         e.stopPropagation();
         Modal.confirm({
-            title: 'Xác nhận xóa',
-            content: `Bạn có chắc muốn xóa công việc "${task.name}"?`,
-            okText: 'Xóa',
-            cancelText: 'Hủy',
+            title: intl.formatMessage(messages.xacNhanXoa),
+            content: intl.formatMessage(messages.banCoChacMuonXoaCongViecName, { name: task.name }),
+            okText: intl.formatMessage(messages.xoa),
+            cancelText: intl.formatMessage(messages.huy),
             okButtonProps: { danger: true },
             onOk: () => onDelete(task.id),
         });
@@ -54,7 +81,7 @@ function BoardCard({ task, onDelete }) {
             <span
                 {...listeners}
                 className={styles.dragHandle}
-                title="Kéo để di chuyển"
+                title={intl.formatMessage(messages.keoDeDiChuyen)}
             >
                 <HolderOutlined />
             </span>
@@ -71,7 +98,7 @@ function BoardCard({ task, onDelete }) {
             <span
                 onClick={handleDeleteClick}
                 className={styles.deleteButton}
-                title="Xóa công việc"
+                title={intl.formatMessage(messages.xoaCongViec)}
             >
                 <DeleteOutlined />
             </span>

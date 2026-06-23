@@ -1,16 +1,83 @@
 import { Table, Tag, Button, Popconfirm, Space, Tooltip, Avatar } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, CarryOutOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, ProjectOutlined, CarryOutOutlined } from '@ant-design/icons';
 import {
   DEPARTMENTS,
   USER_STATUS,
   USER_STATUS_LABELS,
 } from '../../constants/userConstants';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useIntl, defineMessages } from 'react-intl';
+
 import styles from './UserTable.module.scss';
 
-function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, onViewDetails, onViewTasks }) {
+const messages = defineMessages({
+  anhDaiDien: {
+    defaultMessage: 'Ảnh đại diện'
+  },
+  hoVaTen: {
+    defaultMessage: 'Họ và tên'
+  },
+  email: {
+    defaultMessage: 'Email'
+  },
+  soDienThoai: {
+    defaultMessage: 'Số điện thoại'
+  },
+  ngheNghiep: {
+    defaultMessage: 'Nghề nghiệp'
+  },
+  chucVu: {
+    defaultMessage: 'Chức vụ'
+  },
+  trangThai: {
+    defaultMessage: 'Trạng thái'
+  },
+  ngayTao: {
+    defaultMessage: 'Ngày tạo'
+  },
+  hanhDong: {
+    defaultMessage: 'Hành động'
+  },
+  xemThongTin: {
+    defaultMessage: 'Xem thông tin'
+  },
+  xemGiaoDich: {
+    defaultMessage: 'Xem giao dịch'
+  },
+  sua: {
+    defaultMessage: 'Sửa'
+  },
+  xoaNguoiDung: {
+    defaultMessage: 'Xóa người dùng'
+  },
+  banCoChacMuonXoaNguoiDungNay: {
+    defaultMessage: 'Bạn có chắc muốn xóa người dùng này?'
+  },
+  xoa: {
+    defaultMessage: 'Xóa'
+  },
+  huy: {
+    defaultMessage: 'Hủy'
+  },
+  xemDanhSachCongViec: {
+    defaultMessage: 'Xem danh sách công việc'
+  },
+  tongTotalNguoiDung: {
+    defaultMessage: 'Tổng {total} người dùng'
+  }
+});
+
+
+function UserTable({ dataSource, onEdit, onDelete, onViewDetails, onViewTasks, currentPage, onPageChange }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const intl = useIntl();
+  const translatedDepartments = DEPARTMENTS.map(item => ({ ...item, label: intl.formatMessage({ id: `app.constant.${item.value}`, defaultMessage: item.label?.defaultMessage || item.label || item.value }) }));
+  const translatedStatusLabels = Object.keys(USER_STATUS_LABELS).reduce((acc, key) => { acc[key] = intl.formatMessage({ id: `app.constant.${key}`, defaultMessage: USER_STATUS_LABELS[key] }); return acc; }, {});
+
   const columns = [
     {
-      title: 'Ảnh đại diện',
+      title: intl.formatMessage(messages.anhDaiDien),
       dataIndex: 'avatarUrl',
       key: 'avatarUrl',
       width: 120,
@@ -25,42 +92,42 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
       ),
     },
     {
-      title: 'Họ và tên',
+      title: intl.formatMessage(messages.hoVaTen),
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
     },
     {
-      title: 'Email',
+      title: intl.formatMessage(messages.email),
       dataIndex: 'email',
       key: 'email',
       ellipsis: true,
     },
     {
-      title: 'Số điện thoại',
+      title: intl.formatMessage(messages.soDienThoai),
       dataIndex: 'phone',
       key: 'phone',
       width: 140,
     },
     {
-      title: 'Nghề nghiệp',
+      title: intl.formatMessage(messages.ngheNghiep),
       dataIndex: 'occupation',
       key: 'occupation',
       width: 130,
       render: (occupation) => {
-        const found = DEPARTMENTS.find((dep) => dep.value === occupation);
+        const found = translatedDepartments.find((dep) => dep.value === occupation);
         return found ? found.label : occupation;
       },
     },
     {
-      title: 'Chức vụ',
+      title: intl.formatMessage(messages.chucVu),
       dataIndex: 'position',
       key: 'position',
       width: 160,
       ellipsis: true,
     },
     {
-      title: 'Trạng thái',
+      title: intl.formatMessage(messages.trangThai),
       dataIndex: 'status',
       key: 'status',
       width: 140,
@@ -68,13 +135,13 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
         const isActive = status === USER_STATUS.ACTIVE;
         return (
           <Tag color={isActive ? 'success' : 'error'}>
-            {USER_STATUS_LABELS[status]}
+            {translatedStatusLabels[status]}
           </Tag>
         );
       },
     },
     {
-      title: 'Ngày tạo',
+      title: intl.formatMessage(messages.ngayTao),
       dataIndex: 'joinDate',
       key: 'joinDate',
       width: 130,
@@ -89,14 +156,17 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
       },
     },
     {
-      title: 'Hành động',
+      title: intl.formatMessage(messages.hanhDong),
       key: 'action',
       width: 200,
       align: 'center',
       fixed: 'right',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Sửa">
+          <Tooltip title={intl.formatMessage(messages.xemThongTin)}>
+            <Button type="text" icon={<EyeOutlined />} onClick={() => onViewDetails(record)} />
+          </Tooltip>
+          <Tooltip title={intl.formatMessage(messages.sua)}>
             <Button
               type="text"
               icon={<EditOutlined />}
@@ -105,14 +175,14 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
             />
           </Tooltip>
           <Popconfirm
-            title="Xóa người dùng"
-            description="Bạn có chắc muốn xóa người dùng này?"
-            okText="Xóa"
-            cancelText="Hủy"
+            title={intl.formatMessage(messages.xoaNguoiDung)}
+            description={intl.formatMessage(messages.banCoChacMuonXoaNguoiDungNay)}
+            okText={intl.formatMessage(messages.xoa)}
+            cancelText={intl.formatMessage(messages.huy)}
             okButtonProps={{ danger: true }}
             onConfirm={() => onDelete(record.id)}
           >
-            <Tooltip title="Xóa">
+            <Tooltip title={intl.formatMessage(messages.xoa)}>
               <Button
                 type="text"
                 danger
@@ -120,15 +190,11 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
               />
             </Tooltip>
           </Popconfirm>
-          <Tooltip title= "Xem chi tiết chi tiêu">
-            <Button type='text' icon={<EyeOutlined />} style={{ color: 'blue' }}
-            onClick={() => onViewDetails(record)}
-            />
+          <Tooltip title={intl.formatMessage(messages.xemGiaoDich)}>
+            <Button type="text" icon={<ProjectOutlined />} onClick={() => onViewDetails(record)} />
           </Tooltip>
-          <Tooltip title= "Xem danh sách công việc">
-            <Button type='text' icon={<CarryOutOutlined />} style={{ color: 'blue' }}
-            onClick={() => onViewTasks(record)}
-            />
+          <Tooltip title={intl.formatMessage(messages.xemDanhSachCongViec)}>
+            <Button type="text" icon={<CarryOutOutlined />} style={{ color: 'blue' }} onClick={() => onViewTasks(record)} />
           </Tooltip>
         </Space>
       ),
@@ -144,9 +210,9 @@ function UserTable({ dataSource, onEdit, onDelete, currentPage, onPageChange, on
         scroll={{ x: 'max-content' }}
         pagination={{
           current: currentPage,
-          pageSize: 6,
+          pageSize: 5,
           showSizeChanger: false,
-          showTotal: (total) => `Tổng ${total} người dùng`,
+          showTotal: (total) => intl.formatMessage(messages.tongTotalNguoiDung, { total }),
           onChange: onPageChange,
         }}
       />

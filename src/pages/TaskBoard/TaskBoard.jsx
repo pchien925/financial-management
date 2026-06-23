@@ -8,11 +8,14 @@ import { addTask, updateTask, deleteTask, setTasks } from '../../redux/features/
 import { COLUMNS } from '../../constants/tasksConstants';
 import dayjs from 'dayjs';
 import styles from './TaskBoard.module.scss';
+import { useIntl } from 'react-intl';
 
 function TaskBoard() {
   const dispatch = useDispatch();
   const { tasks } = useSelector((state) => state.tasks);
-
+   const intl = useIntl();
+  const translatedColumns = COLUMNS.map(item => ({ ...item, title: intl.formatMessage({ id: `app.constant.${item.id}`, defaultMessage: item.title?.defaultMessage || item.title || item.id }) }));
+ 
   // State cho Modal thêm task
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [addingToStatus, setAddingToStatus] = useState('todo');
@@ -111,7 +114,7 @@ function TaskBoard() {
         onDragEnd={handleDragEnd}
       >
         <div className={styles.taskBoardContainer}>
-          {COLUMNS.map((col) => (
+          {translatedColumns.map((col) => (
             <BoardColumn
               key={col.id}
               columnId={col.id}

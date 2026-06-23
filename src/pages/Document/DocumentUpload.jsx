@@ -3,6 +3,7 @@ import { Button, Input, Popconfirm, Tooltip, message } from 'antd';
 import { DeleteOutlined, DownloadOutlined, UploadOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import styles from './DocumentUpload.module.scss';
+import { useIntl, defineMessages } from 'react-intl';
 
 const CLOUD_NAME = 'dby0mgpvn';
 const UPLOAD_PRESET = 'Reactjs';
@@ -10,14 +11,26 @@ const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
 
 const MAX_DOCUMENTS = 5;
 
-/**
- * DocumentUpload - Component upload tài liệu lên Cloudinary
- * Props:
- *   - value: Array<{ name: string, link: string }> — danh sách tài liệu đã upload
- *   - onChange: (documents: Array<{ name: string, link: string }>) => void
- */
+const messages = defineMessages({
+  uploadSuccess: { id: 'document.uploadSuccess', defaultMessage: 'Tải "{fileName}" lên thành công!' },
+  uploadFailed: { id: 'document.uploadFailed', defaultMessage: 'Tải tài liệu lên thất bại!' },
+  deleteSuccess: { id: 'document.deleteSuccess', defaultMessage: 'Đã xoá tài liệu!' },
+  maxDocuments: { id: 'document.maxDocuments', defaultMessage: 'Tối đa {max} tài liệu!' },
+  noAttachment: { id: 'document.noAttachment', defaultMessage: 'Không có tài liệu đính kèm' },
+  docName: { id: 'document.docName', defaultMessage: 'Tên tài liệu' },
+  deleteTitle: { id: 'document.deleteTitle', defaultMessage: 'Xóa tài liệu' },
+  deleteDesc: { id: 'document.deleteDesc', defaultMessage: 'Bạn có chắc muốn xóa tài liệu này?' },
+  delete: { id: 'document.delete', defaultMessage: 'Xóa' },
+  cancel: { id: 'document.cancel', defaultMessage: 'Hủy' },
+  download: { id: 'document.download', defaultMessage: 'Tải về' },
+  uploading: { id: 'document.uploading', defaultMessage: 'Đang tải lên...' },
+  upload: { id: 'document.upload', defaultMessage: 'Tải lên' },
+  addDoc: { id: 'document.addDoc', defaultMessage: 'Thêm Tài liệu' },
+});
+
 function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly = false }) {
   const [uploadingIndex, setUploadingIndex] = useState(null);
+  const intl = useIntl();
 
   // Upload file lên Cloudinary
   const handleUpload = async (file, index) => {
@@ -34,9 +47,9 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
       const newDocs = [...value];
       newDocs[index] = { name: fileName, link };
       onChange(newDocs);
-      message.success(`Tải "${fileName}" lên thành công!`);
+      message.success(intl.formatMessage(messages.uploadSuccess, { fileName }));
     } catch (error) {
-      message.error('Tải tài liệu lên thất bại!');
+      message.error(intl.formatMessage(messages.uploadFailed));
     } finally {
       setUploadingIndex(null);
     }
@@ -48,7 +61,6 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
     if (file) {
       handleUpload(file, index);
     }
-    // Reset input để có thể chọn lại cùng file
     e.target.value = '';
   };
 
@@ -56,7 +68,7 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
   const handleDelete = (index) => {
     const newDocs = value.filter((_, i) => i !== index);
     onChange(newDocs);
-    message.success('Đã xoá tài liệu!');
+    message.success(intl.formatMessage(messages.deleteSuccess));
   };
 
   // Tải về tài liệu
@@ -75,7 +87,7 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
   // Thêm slot upload mới
   const handleAddSlot = () => {
     if (value.length >= MAX_DOCUMENTS) {
-      message.warning(`Tối đa ${MAX_DOCUMENTS} tài liệu!`);
+      message.warning(intl.formatMessage(messages.maxDocuments, { max: MAX_DOCUMENTS }));
       return;
     }
     // Thêm một slot trống
@@ -94,7 +106,7 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
   return (
     <div className={styles.documentUpload}>
       {displaySlots.length === 0 && readOnly && (
-        <span style={{ color: '#8c8c8c', fontStyle: 'italic' }}>Không có tài liệu đính kèm</span>
+        <span style={{ color: '#8c8c8c', fontStyle: 'italic' }}>{intl.formatMessage(messages.noAttachment)}</span>
       )}
       {displaySlots.map((doc, index) => (
         <div key={index} className={styles.documentRow}>
@@ -105,19 +117,19 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
                 readOnly
                 value={doc.name}
                 className={styles.fileNameInput}
-                placeholder="Tên tài liệu"
+                placeholder={intl.formatMessage(messages.docName)}
               />
               <div className={styles.actionButtons}>
                 {!readOnly && (
                   <Popconfirm
-                    title="Xóa tài liệu"
-                    description="Bạn có chắc muốn xóa tài liệu này?"
-                    okText="Xóa"
-                    cancelText="Hủy"
+                    title={intl.formatMessage(messages.deleteTitle)}
+                    description={intl.formatMessage(messages.deleteDesc)}
+                    okText={intl.formatMessage(messages.delete)}
+                    cancelText={intl.formatMessage(messages.cancel)}
                     okButtonProps={{ danger: true }}
                     onConfirm={() => handleDelete(index)}
                   >
-                    <Tooltip title="Xóa">
+                    <Tooltip title={intl.formatMessage(messages.delete)}>
                       <Button
                         type="text"
                         danger
@@ -127,7 +139,7 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
                     </Tooltip>
                   </Popconfirm>
                 )}
-                <Tooltip title="Tải về">
+                <Tooltip title={intl.formatMessage(messages.download)}>
                   <Button
                     type="text"
                     icon={<DownloadOutlined />}
@@ -144,9 +156,9 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
                 <div className={styles.uploadInputWrapper}>
                   <Input
                     readOnly
-                    placeholder="Tên tài liệu"
+                    placeholder={intl.formatMessage(messages.docName)}
                     className={styles.fileNameInput}
-                    value={uploadingIndex === index ? 'Đang tải lên...' : ''}
+                    value={uploadingIndex === index ? intl.formatMessage(messages.uploading) : ''}
                     suffix={uploadingIndex === index ? <LoadingOutlined spin /> : null}
                   />
                   <input
@@ -158,7 +170,7 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
                   />
                 </div>
                 <div className={styles.actionButtons}>
-                  <Tooltip title="Tải lên">
+                  <Tooltip title={intl.formatMessage(messages.upload)}>
                     <Button
                       type="text"
                       icon={<UploadOutlined />}
@@ -182,7 +194,7 @@ function DocumentUpload({ value = [{ name: '', link: '' }], onChange, readOnly =
           onClick={handleAddSlot}
           block
         >
-          Thêm Tài liệu
+          {intl.formatMessage(messages.addDoc)}
         </Button>
       )}
     </div>

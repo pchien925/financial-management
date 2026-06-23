@@ -13,9 +13,81 @@ import { saveAs } from 'file-saver';
 import {
   CATEGORIES,
 } from '../../constants/financeConstants';
+import { FormattedMessage, useIntl, defineMessages } from 'react-intl';
+
+const messages = defineMessages({
+  quanLyGiaoDich: {
+    defaultMessage: 'Quản lý giao dịch'
+  },
+  xuatExcel: {
+    defaultMessage: 'Xuất Excel'
+  },
+  themGiaoDich: {
+    defaultMessage: 'Thêm giao dịch'
+  },
+  vuiLongChonThangDeXuatDuLieu: {
+    defaultMessage: 'Vui lòng chọn tháng để xuất dữ liệu!'
+  },
+  giaoDich: {
+    defaultMessage: 'Giao dịch'
+  },
+  stt: {
+    defaultMessage: 'STT'
+  },
+  tenNguoiDung: {
+    defaultMessage: 'Tên người dùng'
+  },
+  ghiChu: {
+    defaultMessage: 'Ghi chú'
+  },
+  soTien: {
+    defaultMessage: 'Số tiền'
+  },
+  loai: {
+    defaultMessage: 'Loại'
+  },
+  danhMuc: {
+    defaultMessage: 'Danh mục'
+  },
+  ngay: {
+    defaultMessage: 'Ngày'
+  },
+  thuNhap: {
+    defaultMessage: 'Thu nhập'
+  },
+  chiTieu: {
+    defaultMessage: 'Chi tiêu'
+  },
+  tongThuNhap: {
+    defaultMessage: 'Tổng thu nhập'
+  },
+  tongChiTieu: {
+    defaultMessage: 'Tổng chi tiêu'
+  },
+  xuatExcelThanhCong: {
+    defaultMessage: 'Xuất Excel thành công!'
+  },
+  coLoiXayRaKhiXuatExcel: {
+    defaultMessage: 'Có lỗi xảy ra khi xuất Excel!'
+  },
+  chonThangXuatDuLieu: {
+    defaultMessage: 'Chọn tháng xuất dữ liệu'
+  },
+  huy: {
+    defaultMessage: 'Hủy'
+  },
+  chonThang: {
+    defaultMessage: 'Chọn tháng'
+  },
+  khongCoDuLieuThoaManDieuKienTrongThangMonthDeXuat: {
+    defaultMessage: 'Không có dữ liệu thỏa mãn điều kiện trong tháng {month} để xuất!'
+  }
+});
+
 
 function Finance() {
   const navigate = useNavigate();
+  const intl = useIntl();
   // Lấy dữ liệu trực tiếp từ Redux store
   const { transactions } = useSelector((state) => state.finance);
   const { users } = useSelector((state) => state.user);
@@ -106,7 +178,7 @@ function Finance() {
   // hàm xử lý xác nhận xuất Excel từ Modal
   const handleConfirmExport = async () => {
     if (!exportMonth) {
-      message.warning('Vui lòng chọn tháng để xuất dữ liệu!');
+      message.warning(intl.formatMessage(messages.vuiLongChonThangDeXuatDuLieu));
       return;
     }
     
@@ -115,7 +187,7 @@ function Finance() {
     const dataToExport = filteredTransactions.filter(item => item.date && item.date.startsWith(monthStr));
 
     if(dataToExport.length === 0) {
-      message.warning(`Không có dữ liệu thỏa mãn điều kiện trong tháng ${exportMonth.format('MM/YYYY')} để xuất!`);
+      message.warning(intl.formatMessage(messages.khongCoDuLieuThoaManDieuKienTrongThangMonthDeXuat, { month: exportMonth.format('MM/YYYY') }));
       return;
     }
     
@@ -127,16 +199,16 @@ function Finance() {
 
     try {
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Giao dịch');
+      const worksheet = workbook.addWorksheet(intl.formatMessage(messages.giaoDich));
 
       worksheet.columns = [
-        { header: 'STT', key: 'stt', width: 8 },
-        { header: 'Tên người dùng', key: 'userName', width: 25 },
-        { header: 'Ghi chú', key: 'note', width: 35 },
-        { header: 'Số tiền', key: 'amount', width: 20 },
-        { header: 'Loại', key: 'type', width: 12 },
-        { header: 'Danh mục', key: 'category', width: 20 },
-        { header: 'Ngày', key: 'date', width: 15 },
+        { header: intl.formatMessage(messages.stt), key: 'stt', width: 8 },
+        { header: intl.formatMessage(messages.tenNguoiDung), key: 'userName', width: 25 },
+        { header: intl.formatMessage(messages.ghiChu), key: 'note', width: 35 },
+        { header: intl.formatMessage(messages.soTien), key: 'amount', width: 20 },
+        { header: intl.formatMessage(messages.loai), key: 'type', width: 12 },
+        { header: intl.formatMessage(messages.danhMuc), key: 'category', width: 20 },
+        { header: intl.formatMessage(messages.ngay), key: 'date', width: 15 },
       ];
 
       // Tính tổng thu và tổng chi
@@ -159,7 +231,7 @@ function Finance() {
           userName: user ? user.name : 'N/A',
           note: item.note,
           amount: formatAmountForExcel(item.amount, item.type),
-          type: item.type === 'income' ? 'Thu nhập' : 'Chi tiêu',
+          type: item.type === 'income' ? intl.formatMessage(messages.thuNhap) : intl.formatMessage(messages.chiTieu),
           category: catgoryLabel,
           date: formatDateForExcel(item.date),
         };
@@ -177,7 +249,7 @@ function Finance() {
 
       // Thêm dòng tổng thu nhập
       const incomeRow = worksheet.addRow({
-        note: 'Tổng thu nhập',
+        note: intl.formatMessage(messages.tongThuNhap),
         amount: `+${totalIncome.toLocaleString('vi-VN')}`,
       });
       incomeRow.getCell('note').font = { bold: true, color: { argb: 'FF389E0D' } };
@@ -186,7 +258,7 @@ function Finance() {
 
       // Thêm dòng tổng chi tiêu
       const expenseRow = worksheet.addRow({
-        note: 'Tổng chi tiêu',
+        note: intl.formatMessage(messages.tongChiTieu),
         amount: `-${totalExpense.toLocaleString('vi-VN')}`,
       });
       expenseRow.getCell('note').font = { bold: true, color: { argb: 'FFCF1322' } };
@@ -198,11 +270,11 @@ function Finance() {
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       saveAs(blob, `giao_dich_${monthStr}.xlsx`);
 
-      message.success('Xuất Excel thành công!');
+      message.success(intl.formatMessage(messages.xuatExcelThanhCong));
       setIsExportModalOpen(false);
     } catch (error) {
       console.error('Lỗi khi xuất Excel:', error);
-      message.error('Có lỗi xảy ra khi xuất Excel!');
+      message.error(intl.formatMessage(messages.coLoiXayRaKhiXuatExcel));
     }
   };
 
@@ -222,7 +294,7 @@ function Finance() {
   return (
     <div className={styles.financeWrapper}>
       <div className={styles.toolbar}>
-        <h2 className={styles.pageTitle}>Quản lý giao dịch</h2>
+        <h2 className={styles.pageTitle}><FormattedMessage {...messages.quanLyGiaoDich}  /></h2>
         <Space>
           <Button
             type="primary"
@@ -231,7 +303,7 @@ function Finance() {
             size="large"
             onClick={() => setIsExportModalOpen(true)}
           >
-            Xuất Excel
+            <FormattedMessage {...messages.xuatExcel}  />
           </Button>
           <Button
             type="primary"
@@ -241,7 +313,7 @@ function Finance() {
               navigate(`/transactions/add?${searchParams.toString()}`);
             }}
           >
-            Thêm giao dịch
+            <FormattedMessage {...messages.themGiaoDich}  />
           </Button>
         </Space>
       </div>
@@ -271,19 +343,19 @@ function Finance() {
         record={detailRecord}
       />
       <Modal
-        title="Chọn tháng xuất dữ liệu"
+        title={intl.formatMessage(messages.chonThangXuatDuLieu)}
         open={isExportModalOpen}
         onOk={handleConfirmExport}
         onCancel={() => setIsExportModalOpen(false)}
-        okText="Xuất Excel"
-        cancelText="Hủy"
+        okText={intl.formatMessage(messages.xuatExcel)}
+        cancelText={intl.formatMessage(messages.huy)}
         destroyOnClose
       >
         <div style={{ padding: '20px 0' }}>
           <DatePicker 
             picker="month" 
             onChange={(date) => setExportMonth(date)}
-            placeholder="Chọn tháng"
+            placeholder={intl.formatMessage(messages.chonThang)}
             format="MM-YYYY"
             style={{ width: '100%' }}
           />
