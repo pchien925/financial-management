@@ -18,68 +18,107 @@ const routers = createBrowserRouter([
     element: <AppLayout />, 
     children: [
       {
-        index : true,
+        index: true,
         element: <Navigate to="/dashboard/finance" replace />
       },
+
+      {
+        path: 'dashboard',
+        children: [
+          {
+            path: 'finance',
+            element: <Dashboard />,
+            handle: { title: 'Thống kê Tài Chính' }
+          },
+          {
+            path: 'user',
+            element: <UserDashboard />,
+            handle: { title: 'Thống kê Người Dùng' }
+          }
+        ]
+      },
+
       {
         path: 'transactions',
-        element: <Finance/>
+        handle: { title: 'Quản Lý Giao Dịch' },
+        children: [
+          {
+            index: true,
+            element: <Finance />
+          },
+          {
+            path: 'add',
+            element: <FinanceForm />,
+            handle: { title: 'Thêm Giao Dịch' }
+          },
+          {
+            path: 'edit/:id',
+            element: <FinanceForm />,
+            handle: { title: 'Chỉnh Sửa Giao Dịch' }
+          }
+        ]
       },
-      {
-        path: 'transactions/add',
-        element: <FinanceForm/>
-      },
-      {
-        path: 'transactions/edit/:id',
-        element: <FinanceForm/>
-      },
-      {
-        path: 'dashboard/finance',
-        element: <Dashboard/>
-      },
-      {
-        path: 'dashboard/user',
-        element: <UserDashboard/>
-      },
+
       {
         path: 'users',
-        element: <User/>
+        handle: { title: 'Quản lý người dùng' },
+        children: [
+          {
+            index: true,
+            element: <User />
+          },
+          {
+            path: 'add',
+            element: <UserForm />,
+            handle: { title: 'Thêm người dùng' }
+          },
+          {
+            path: 'edit/:id',
+            element: <UserForm />,
+            handle: { title: 'Chỉnh sửa người dùng' }
+          },
+
+          {
+            path: ':id/details',
+            handle: { title: 'Chi Tiêu Người Dùng' },
+            children: [
+              {
+                index: true,
+                element: <UserTransactions />
+              },
+              {
+                path: 'add',
+                element: <UserTransactionForm />,
+                handle: { title: 'Thêm chi tiêu' }
+              },
+              {
+                path: 'edit/:transactionId',
+                element: <UserTransactionForm />,
+                handle: { title: 'Chỉnh Sửa Chi Tiêu' }
+              }
+            ]
+          },
+
+          {
+            path: ':id/tasks',
+            element: <UserTasks />,
+            handle: { title: 'Danh sách công việc' }
+          }
+        ]
       },
-      {
-        path: 'users/add',
-        element: <UserForm/>
-      },
-      {
-        path: 'users/edit/:id',
-        element: <UserForm/>
-      },
-      {
-        path: 'users/:id/details',
-        element: <UserTransactions/>
-      },
-      {
-        path: 'users/:userId/details/add',
-        element: <UserTransactionForm/>
-      },
-      {
-        path: 'users/:userId/details/edit/:transactionId',
-        element: <UserTransactionForm/>
-      },
-      {
-        path: 'users/:id/tasks',
-        element: <UserTasks/>
-      },
+
       {
         path: 'tasks',
-        element: <Tasks/>
+        element: <Tasks />,
+        handle: { title: 'Quản lý công việc' }
       },
       {
-        path: '/taskboard',
-        element: <TaskBoard/>
+        path: 'taskboard',
+        element: <TaskBoard />,
+        handle: { title: 'Bảng công việc' }
       }
     ]
   }
 ]);
 
 export default routers;
-
